@@ -1,0 +1,22 @@
+{
+  "translation": {
+    "store_name": "Manies Departmental Store",
+    "special_offers": "Today's Special Offers",
+    "language": "Language",
+    "english": "English",
+    "malayalam": "മലയാളം",
+    "original_price": "M.R.P:",
+    "discount_price": "Our Price:",
+    "save": "You Save:",
+    "categories": {
+      "all": "All",
+      "groceries": "Groceries",
+      "vegetables": "Vegetables",
+      "household": "Household & Cleaning Products",
+      "personal": "Personal Care Products"
+    },
+    "contact_us": "Contact Us",
+    "footer_address": "Palace Rd, Wadakkanchery, Kerala",
+    "footer_hours": "Open Daily except Sundays from 9:30 AM - 9 PM"
+  }
+}

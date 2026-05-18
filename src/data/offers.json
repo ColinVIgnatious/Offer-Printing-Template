@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "image": "/ajmiputtu-podi-5kg.webp",
+    "category": "groceries",
+    "originalPrice": 447,
+    "price": 312,
+    "en": { "title": "Ajmi Puttu Powder 5kg" },
+    "ml": { "title": "അജ്മി പുട്ട് പൊടി 5kg" }
+  },
+  {
+    "id": 2,
+    "image": "/ajmiricepowder5kg.webp",
+    "category": "groceries",
+    "originalPrice": 447,
+    "price": 327,
+    "en": { "title": "Ajmi Rice Powder 5kg" },
+    "ml": { "title": "അജ്മി റൈസ് പൗഡർ 5kg" }
+  },
+  {
+    "id": 3,
+    "image": "/lux-fresh-glow-set 150gmX3.webp",
+    "category": "personal",
+    "originalPrice": 177,
+    "price": 157,
+    "en": { "title": "Lux Fresh Glow Soap Set 3X150g" },
+    "ml": { "title": "ലക്സ് ഫ്രഷ് ഗ്ലോ സോപ്പ് സെറ്റ് 3X150g" }
+  },
+  {
+    "id": 4,
+    "image": "/lux-radiant-glow set150gmX3.jpg",
+    "category": "personal",
+    "originalPrice": 179,
+    "price": 159,
+    "en": { "title": "Lux Radiant Glow Soap Set 3X150g" },
+    "ml": { "title": "ലക്സ് റേഡിയൻ്റ് ഗ്ലോ സോപ്പ് സെറ്റ് 3X150g" }
+  },
+  {
+    "id": 5,
+    "image": "/surfexcel_matic_frontload3L.jpg",
+    "category": "household",
+    "originalPrice": 539,
+    "price": 489,
+    "en": { "title": "Surf Excel Matic Front Load 3L" },
+    "ml": { "title": "സെർഫ് എക്സൽ മാറ്റിക് ഫ്രണ്ട് ലോഡ് 3L" }
+  },
+  {
+    "id": 6,
+    "image": "/momsmagic_cashewfamily870gm.jpg",
+    "category": "groceries",
+    "originalPrice": 256,
+    "price": 180,
+    "en": { "title": "Moms Magic Cashew & Almond Family Pack 870gm" },
+    "ml": { "title": "മംമ്സ് മാജിക്ക് ക്യാഷൂ & അൽമോൻഡ് ഫാമിലി പായ്ക്ക് 870 ഗ്രാം" }
+  },
+  {
+    "id": 7,
+    "image": "/lux-radiant-glow set150gmX3.jpg",
+    "category": "personal",
+    "originalPrice": 240,
+    "price": 215,
+    "en": { "title": "Colgate Salt Toothpaste 300g" },
+    "ml": { "title": "കോൾഗേറ്റ് സോൾട്ട് ടൂത്ത്പേസ്റ്റ് 300g" }
+  }
+]
