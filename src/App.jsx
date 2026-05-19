@@ -330,6 +330,45 @@ async function printProductSheet() {
   window.setTimeout(() => window.print(), 100);
 }
 
+function imageFileToPrintDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new window.Image();
+
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      context.drawImage(image, 0, 0);
+
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      for (let index = 0; index < imageData.data.length; index += 4) {
+        const gray = Math.round(
+          imageData.data[index] * 0.299
+          + imageData.data[index + 1] * 0.587
+          + imageData.data[index + 2] * 0.114
+        );
+        imageData.data[index] = gray;
+        imageData.data[index + 1] = gray;
+        imageData.data[index + 2] = gray;
+      }
+
+      context.putImageData(imageData, 0, 0);
+      URL.revokeObjectURL(objectUrl);
+      resolve(canvas.toDataURL('image/png'));
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Uploaded image could not be loaded'));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
 function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
   const [products, setProducts] = useState([
     {
@@ -361,11 +400,13 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      updateProduct(index, 'uploadedImage', reader.result);
-    };
-    reader.readAsDataURL(file);
+    imageFileToPrintDataUrl(file)
+      .then((imageDataUrl) => {
+        updateProduct(index, 'uploadedImage', imageDataUrl);
+      })
+      .catch(() => {
+        setImageFailed((current) => ({ ...current, [index]: true }));
+      });
   };
 
   useEffect(() => {
