@@ -380,8 +380,10 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
       offerPrice: '99',
     },
     EMPTY_PRODUCT,
+    EMPTY_PRODUCT,
+    EMPTY_PRODUCT,
   ]);
-  const [showSecondProduct, setShowSecondProduct] = useState(false);
+  const [visibleProductCount, setVisibleProductCount] = useState(1);
   const [imageFailed, setImageFailed] = useState({});
   const [apiProductNames, setApiProductNames] = useState({});
 
@@ -485,34 +487,27 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
             <Tag size={22} />
             <div>
               <h1>Product Print</h1>
-              <p>Create a black-and-white half-A4 offer template. Add a second product to use the full page.</p>
+              <p>Create a black-and-white landscape A4 offer sheet with up to four products.</p>
             </div>
           </div>
 
-          <ProductForm
-            product={products[0]}
-            productIndex={0}
-            title="Product 1"
-            previewName={printableProducts[0].displayName}
-            hasApiProductName={printableProducts[0].hasApiProductName}
-            updateProduct={updateProduct}
-            updateProductImageFile={updateProductImageFile}
-          />
-
-          {showSecondProduct ? (
+          {products.slice(0, visibleProductCount).map((product, index) => (
             <ProductForm
-              product={products[1]}
-              productIndex={1}
-              title="Product 2"
-              previewName={printableProducts[1].displayName}
-              hasApiProductName={printableProducts[1].hasApiProductName}
+              key={index}
+              product={product}
+              productIndex={index}
+              title={`Product ${index + 1}`}
+              previewName={printableProducts[index].displayName}
+              hasApiProductName={printableProducts[index].hasApiProductName}
               updateProduct={updateProduct}
               updateProductImageFile={updateProductImageFile}
             />
-          ) : (
-            <button className="add-product-btn" onClick={() => setShowSecondProduct(true)}>
+          ))}
+
+          {visibleProductCount < products.length && (
+            <button className="add-product-btn" onClick={() => setVisibleProductCount((count) => count + 1)}>
               <Plus size={18} />
-              Add product 2
+              Add product {visibleProductCount + 1}
             </button>
           )}
 
@@ -524,7 +519,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
 
         <ProductPrintPreview
           products={printableProducts}
-          showSecondProduct={showSecondProduct}
+          visibleProductCount={visibleProductCount}
           setImageFailed={setImageFailed}
         />
       </main>
@@ -631,10 +626,12 @@ function ProductForm({
 
 function ProductPrintPreview({
   products,
-  showSecondProduct,
+  visibleProductCount,
   setImageFailed,
 }) {
-  const visibleProducts = showSecondProduct ? products : [products[0], EMPTY_PRODUCT];
+  const visibleProducts = products.map((product, index) => (
+    index < visibleProductCount ? product : EMPTY_PRODUCT
+  ));
 
   return (
     <section className="print-preview" aria-label="Product print preview">

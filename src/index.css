@@ -479,9 +479,10 @@ h3 { font-size: 1.5rem; }
 }
 
 .print-sheet {
-  width: min(100%, 560px);
-  aspect-ratio: 210 / 297;
+  width: min(100%, 820px);
+  aspect-ratio: 297 / 210;
   display: grid;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   background: white;
   border: 1px solid #111;
@@ -497,10 +498,15 @@ h3 { font-size: 1.5rem; }
   min-height: 0;
   overflow: hidden;
   background: #fff;
+  border-right: 1px dashed #111;
   border-bottom: 1px dashed #111;
 }
 
-.print-product-panel:last-child {
+.print-product-panel:nth-child(2n) {
+  border-right: 0;
+}
+
+.print-product-panel:nth-last-child(-n + 2) {
   border-bottom: 0;
 }
 
@@ -548,7 +554,7 @@ h3 { font-size: 1.5rem; }
   max-width: 100%;
   color: #000;
   font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
-  font-size: clamp(2rem, 5.5vw, 3.8rem);
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
   font-weight: 900;
   line-height: 1.12;
   overflow-wrap: anywhere;
@@ -566,7 +572,7 @@ h3 { font-size: 1.5rem; }
 .print-product-title-block p {
   max-width: 70%;
   color: #000;
-  font-size: clamp(1.3rem, 3.2vw, 2.2rem);
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
   font-weight: 900;
   line-height: 1;
   overflow-wrap: anywhere;
@@ -586,8 +592,8 @@ h3 { font-size: 1.5rem; }
   z-index: 3;
   left: 1rem;
   right: 1rem;
-  bottom: 1rem;
-  min-height: 4.8rem;
+  bottom: 0.8rem;
+  min-height: 3.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -600,7 +606,7 @@ h3 { font-size: 1.5rem; }
 
 .print-product-mrp-label {
   color: #000;
-  font-size: clamp(1.2rem, 3vw, 1.9rem);
+  font-size: clamp(0.95rem, 1.6vw, 1.25rem);
   font-weight: 900;
   white-space: nowrap;
 }
@@ -611,7 +617,7 @@ h3 { font-size: 1.5rem; }
 
 .print-product-offer {
   color: #000;
-  font-size: clamp(2.4rem, 6vw, 4.3rem);
+  font-size: clamp(1.9rem, 3.6vw, 3rem);
   font-weight: 900;
   line-height: 0.95;
   white-space: nowrap;
@@ -631,7 +637,7 @@ h3 { font-size: 1.5rem; }
   border-radius: 999px;
   background: #fff;
   color: #000;
-  font-size: clamp(1rem, 2.4vw, 1.55rem);
+  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
   font-weight: 900;
   line-height: 1;
   white-space: nowrap;
@@ -667,14 +673,14 @@ h3 { font-size: 1.5rem; }
 @media print {
   @page {
     margin: 0;
-    size: A4;
+    size: A4 landscape;
   }
 
   html,
   body {
     background: white;
-    width: 210mm;
-    min-height: 297mm;
+    width: 297mm;
+    min-height: 210mm;
   }
 
   .no-print {
@@ -692,7 +698,7 @@ h3 { font-size: 1.5rem; }
 
   .print-builder {
     display: block;
-    width: 210mm;
+    width: 297mm;
     margin: 0;
   }
 
@@ -701,8 +707,8 @@ h3 { font-size: 1.5rem; }
   }
 
   .print-sheet {
-    width: 210mm;
-    height: 297mm;
+    width: 297mm;
+    height: 210mm;
     aspect-ratio: auto;
     border: 0;
     border-radius: 0;
@@ -714,12 +720,12 @@ h3 { font-size: 1.5rem; }
   }
 
   .print-product-panel {
-    height: 148.5mm;
+    height: 105mm;
     break-inside: avoid;
   }
 
   .print-product-overlay {
-    padding: 12mm;
+    padding: 7mm;
   }
 
   .print-product-bg {
@@ -727,36 +733,37 @@ h3 { font-size: 1.5rem; }
   }
 
   .print-product-title-block h2 {
-    font-size: 23mm;
-    -webkit-text-stroke: 0.9mm #fff;
-  }
-
-  .print-product-title-block p {
-    font-size: 12mm;
+    font-size: 14mm;
     -webkit-text-stroke: 0.55mm #fff;
   }
 
+  .print-product-title-block p {
+    font-size: 7mm;
+    -webkit-text-stroke: 0.35mm #fff;
+  }
+
   .print-product-price-line {
-    left: 12mm;
-    right: 12mm;
-    bottom: 10mm;
-    min-height: 24mm;
+    left: 7mm;
+    right: 7mm;
+    bottom: 6mm;
+    min-height: 16mm;
+    border-width: 0.8mm;
   }
 
   .print-product-mrp-label {
-    font-size: 10mm;
+    font-size: 6mm;
   }
 
   .print-product-offer {
-    font-size: 20mm;
+    font-size: 12mm;
   }
 
   .print-discount-pill {
-    right: 10mm;
-    top: 8mm;
-    min-height: 11mm;
-    padding: 1.5mm 4mm;
-    border-width: 0.9mm;
-    font-size: 7mm;
+    right: 7mm;
+    top: 6mm;
+    min-height: 8mm;
+    padding: 1mm 3mm;
+    border-width: 0.7mm;
+    font-size: 4.5mm;
   }
 }
