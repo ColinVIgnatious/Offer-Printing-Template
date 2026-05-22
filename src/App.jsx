@@ -678,16 +678,20 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
       <div className="print-product-overlay">
         <div className="print-product-title-block">
           <h2 lang="ml">{displayName}</h2>
-          {quantity && <p>{quantity}</p>}
+          {(quantity || discountPercent > 0) && (
+            <div className="print-product-meta-line">
+              {quantity && <p>{quantity}</p>}
+              {discountPercent > 0 && (
+                <span className="print-discount-pill">{discountPercent}% OFF</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div className="print-product-price-line">
         <span className="print-product-mrp-label">MRP <span className="print-product-mrp-value">₹{mrp}</span></span>
         <span className="print-product-offer">₹{offerPrice}</span>
       </div>
-      {discountPercent > 0 && (
-        <div className="print-discount-pill">{discountPercent}% OFF</div>
-      )}
     </article>
   );
 }

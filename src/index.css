@@ -547,7 +547,7 @@ h3 { font-size: 1.5rem; }
   width: 100%;
   display: grid;
   justify-items: start;
-  gap: 0.15rem;
+  gap: 0.25rem;
 }
 
 .print-product-title-block h2 {
@@ -569,8 +569,14 @@ h3 { font-size: 1.5rem; }
     -2px -2px 0 #fff;
 }
 
-.print-product-title-block p {
-  max-width: 70%;
+.print-product-meta-line {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+}
+
+.print-product-meta-line p {
   color: #000;
   font-size: clamp(1rem, 1.8vw, 1.5rem);
   font-weight: 900;
@@ -624,20 +630,16 @@ h3 { font-size: 1.5rem; }
 }
 
 .print-discount-pill {
-  position: absolute;
-  z-index: 3;
-  right: 1rem;
-  top: 1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.4rem;
-  padding: 0.35rem 0.85rem;
+  min-height: 1.8rem;
+  padding: 0.22rem 0.65rem;
   border: 3px solid #000;
   border-radius: 999px;
   background: #fff;
   color: #000;
-  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+  font-size: clamp(0.75rem, 1.25vw, 1rem);
   font-weight: 900;
   line-height: 1;
   white-space: nowrap;
@@ -737,7 +739,11 @@ h3 { font-size: 1.5rem; }
     -webkit-text-stroke: 0.55mm #fff;
   }
 
-  .print-product-title-block p {
+  .print-product-meta-line {
+    gap: 3mm;
+  }
+
+  .print-product-meta-line p {
     font-size: 7mm;
     -webkit-text-stroke: 0.35mm #fff;
   }
@@ -759,11 +765,9 @@ h3 { font-size: 1.5rem; }
   }
 
   .print-discount-pill {
-    right: 7mm;
-    top: 6mm;
-    min-height: 8mm;
-    padding: 1mm 3mm;
+    min-height: 7mm;
+    padding: 0.9mm 2.8mm;
     border-width: 0.7mm;
-    font-size: 4.5mm;
+    font-size: 4.2mm;
   }
 }
