@@ -645,6 +645,96 @@ h3 { font-size: 1.5rem; }
   white-space: nowrap;
 }
 
+.wholesale-sheet {
+  width: min(100%, 620px);
+  aspect-ratio: 210 / 297;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  background: white;
+  border: 1px solid #111;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  color: #000;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wholesale-product-panel {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border-right: 1px dashed #111;
+  border-bottom: 1px dashed #111;
+  padding: 0.5rem;
+}
+
+.wholesale-product-panel:nth-child(3n) {
+  border-right: 0;
+}
+
+.wholesale-product-panel:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.wholesale-product-image-wrap {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wholesale-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wholesale-product-name {
+  width: 100%;
+  margin: 0.2rem 0;
+  color: #000;
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  font-size: clamp(0.65rem, 1.5vw, 0.95rem);
+  font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.wholesale-product-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 2px solid #000;
+  padding: 0.25rem 0.4rem;
+  background: #fff;
+}
+
+.wholesale-product-mrp {
+  color: #000;
+  font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+  font-weight: 700;
+  text-decoration: line-through;
+  white-space: nowrap;
+}
+
+.wholesale-product-wsp {
+  color: #000;
+  font-size: clamp(0.85rem, 2vw, 1.2rem);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .print-only {
   display: none;
 }
@@ -664,6 +754,10 @@ h3 { font-size: 1.5rem; }
   }
 
   .print-sheet {
+    width: 100%;
+  }
+
+  .wholesale-sheet {
     width: 100%;
   }
 
@@ -769,5 +863,54 @@ h3 { font-size: 1.5rem; }
     padding: 0.9mm 2.8mm;
     border-width: 0.7mm;
     font-size: 4.2mm;
+  }
+
+  .wholesale-offer-page {
+    display: block;
+    background: white;
+  }
+
+  body:has(.wholesale-offer-page) {
+    width: 210mm;
+    min-height: 297mm;
+  }
+
+  .wholesale-offer-page .print-builder {
+    width: 210mm;
+  }
+
+  .wholesale-sheet {
+    width: 210mm;
+    height: 297mm;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .wholesale-product-panel {
+    height: 74.25mm;
+    break-inside: avoid;
+    padding: 4mm;
+  }
+
+  .wholesale-product-name {
+    font-size: 4.5mm;
+    margin: 1mm 0;
+  }
+
+  .wholesale-product-price-row {
+    gap: 2mm;
+    padding: 1mm 2.5mm;
+    border-width: 0.6mm;
+  }
+
+  .wholesale-product-mrp {
+    font-size: 3mm;
+  }
+
+  .wholesale-product-wsp {
+    font-size: 5.5mm;
   }
 }

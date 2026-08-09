@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Home, Image, IndianRupee, MapPin, Phone, Plus, Printer, ShoppingBag, Tag } from 'lucide-react';
+import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, ShoppingBag, Tag } from 'lucide-react';
 import offers from './data/offers.json';
 
 const PRODUCT_PRINT_PATH = '/product-print';
+const WHOLESALE_PRINT_PATH = '/wholesale-offer';
+const WHOLESALE_PRODUCT_COUNT = 12;
 const MALAYALAM_RANGE = /[\u0D00-\u0D7F]/;
 const VIRAMA = '്';
 const EMPTY_PRODUCT = {
@@ -13,6 +15,13 @@ const EMPTY_PRODUCT = {
   quantity: '',
   mrp: '',
   offerPrice: '',
+};
+const EMPTY_WHOLESALE_PRODUCT = {
+  name: '',
+  imageUrl: '',
+  uploadedImage: '',
+  mrp: '',
+  wholesalePrice: '',
 };
 
 const MALAYALAM_VOWELS = [
@@ -105,6 +114,17 @@ function App() {
     );
   }
 
+  if (currentPath === WHOLESALE_PRINT_PATH) {
+    return (
+      <WholesaleOfferPage
+        t={t}
+        i18n={i18n}
+        toggleLanguage={toggleLanguage}
+        navigate={navigate}
+      />
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Header */}
@@ -119,6 +139,10 @@ function App() {
             <button className="nav-link" onClick={() => navigate(PRODUCT_PRINT_PATH)}>
               <Printer size={18} />
               Print Product
+            </button>
+            <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
+              <Package size={18} />
+              Wholesale Offer
             </button>
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
@@ -307,7 +331,7 @@ async function transliterateWithApi(value, signal) {
 }
 
 async function waitForPrintImages() {
-  const images = Array.from(document.querySelectorAll('.print-product-bg'));
+  const images = Array.from(document.querySelectorAll('.print-product-bg, .wholesale-product-image'));
 
   await Promise.all(images.map((image) => {
     if (image.complete && image.naturalWidth > 0) {
@@ -328,6 +352,15 @@ async function waitForPrintImages() {
 async function printProductSheet() {
   await waitForPrintImages();
   window.setTimeout(() => window.print(), 100);
+}
+
+function imageFileToColorDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Uploaded image could not be read'));
+    reader.readAsDataURL(file);
+  });
 }
 
 function imageFileToPrintDataUrl(file) {
@@ -475,6 +508,10 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
             <button className="nav-link" onClick={() => navigate('/')}>
               <Home size={18} />
               Offers
+            </button>
+            <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
+              <Package size={18} />
+              Wholesale Offer
             </button>
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
@@ -691,6 +728,302 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
       <div className="print-product-price-line">
         <span className="print-product-mrp-label">MRP <span className="print-product-mrp-value">₹{mrp}</span></span>
         <span className="print-product-offer">₹{offerPrice}</span>
+      </div>
+    </article>
+  );
+}
+
+function WholesaleOfferPage({ t, i18n, toggleLanguage, navigate }) {
+  const [products, setProducts] = useState(() => (
+    Array.from({ length: WHOLESALE_PRODUCT_COUNT }, () => ({ ...EMPTY_WHOLESALE_PRODUCT }))
+  ));
+  const [visibleProductCount, setVisibleProductCount] = useState(1);
+  const [imageFailed, setImageFailed] = useState({});
+  const [apiProductNames, setApiProductNames] = useState({});
+
+  const updateProduct = (index, field, value) => {
+    setProducts((current) => current.map((product, productIndex) => (
+      productIndex === index ? { ...product, [field]: value } : product
+    )));
+
+    if (field === 'imageUrl' || field === 'uploadedImage') {
+      setImageFailed((current) => ({ ...current, [index]: false }));
+    }
+  };
+
+  const updateProductImageFile = (index, file) => {
+    if (!file) {
+      return;
+    }
+
+    imageFileToColorDataUrl(file)
+      .then((imageDataUrl) => {
+        updateProduct(index, 'uploadedImage', imageDataUrl);
+      })
+      .catch(() => {
+        setImageFailed((current) => ({ ...current, [index]: true }));
+      });
+  };
+
+  useEffect(() => {
+    const controllers = [];
+    const timeoutId = window.setTimeout(() => {
+      products.forEach((product, index) => {
+        const typedName = product.name.trim();
+
+        if (!typedName || MALAYALAM_RANGE.test(product.name)) {
+          return;
+        }
+
+        const controller = new AbortController();
+        controllers.push(controller);
+
+        transliterateWithApi(product.name, controller.signal)
+          .then((transliteratedName) => {
+            setApiProductNames((current) => ({
+              ...current,
+              [index]: { raw: product.name, value: transliteratedName },
+            }));
+          })
+          .catch((error) => {
+            if (error.name !== 'AbortError') {
+              setApiProductNames((current) => ({
+                ...current,
+                [index]: { raw: '', value: '' },
+              }));
+            }
+          });
+      });
+    }, 250);
+
+    return () => {
+      controllers.forEach((controller) => controller.abort());
+      window.clearTimeout(timeoutId);
+    };
+  }, [products]);
+
+  const printableProducts = products.map((product, index) => {
+    const apiProductName = apiProductNames[index];
+    const hasApiProductName = apiProductName?.raw === product.name;
+    const localProductName = manglishToMalayalam(product.name);
+
+    return {
+      ...product,
+      displayName: (hasApiProductName ? apiProductName.value : localProductName).trim(),
+      hasApiProductName,
+      printImage: product.uploadedImage || product.imageUrl.trim(),
+      hasImage: Boolean((product.uploadedImage || product.imageUrl.trim()) && !imageFailed[index]),
+    };
+  });
+
+  return (
+    <div className="app-container wholesale-offer-page">
+      <header className="header no-print">
+        <div className="container flex-between">
+          <button className="brand-button" onClick={() => navigate('/')}>
+            <ShoppingBag color="var(--primary)" size={32} />
+            <span className="text-primary">{t('store_name')}</span>
+          </button>
+
+          <div className="header-actions">
+            <button className="nav-link" onClick={() => navigate('/')}>
+              <Home size={18} />
+              Offers
+            </button>
+            <button className="nav-link" onClick={() => navigate(PRODUCT_PRINT_PATH)}>
+              <Printer size={18} />
+              Print Product
+            </button>
+            <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
+          </div>
+        </div>
+      </header>
+
+      <main className="print-builder">
+        <section className="print-builder-panel no-print">
+          <div className="section-heading">
+            <Package size={22} />
+            <div>
+              <h1>Wholesale Offer</h1>
+              <p>Create a black-and-white portrait A4 wholesale sheet with up to {WHOLESALE_PRODUCT_COUNT} products, 3 columns by 4 rows.</p>
+            </div>
+          </div>
+
+          {products.slice(0, visibleProductCount).map((product, index) => (
+            <WholesaleProductForm
+              key={index}
+              product={product}
+              productIndex={index}
+              title={`Product ${index + 1}`}
+              previewName={printableProducts[index].displayName}
+              hasApiProductName={printableProducts[index].hasApiProductName}
+              updateProduct={updateProduct}
+              updateProductImageFile={updateProductImageFile}
+            />
+          ))}
+
+          {visibleProductCount < products.length && (
+            <button className="add-product-btn" onClick={() => setVisibleProductCount((count) => count + 1)}>
+              <Plus size={18} />
+              Add product {visibleProductCount + 1}
+            </button>
+          )}
+
+          <button className="btn btn-primary print-action" onClick={printProductSheet}>
+            <Printer size={20} />
+            Print
+          </button>
+        </section>
+
+        <WholesaleOfferPreview
+          products={printableProducts}
+          visibleProductCount={visibleProductCount}
+          setImageFailed={setImageFailed}
+        />
+      </main>
+
+      <style>{'@media print { @page { size: A4 portrait; margin: 0; } }'}</style>
+    </div>
+  );
+}
+
+function WholesaleProductForm({
+  product,
+  productIndex,
+  title,
+  previewName,
+  hasApiProductName,
+  updateProduct,
+  updateProductImageFile,
+}) {
+  return (
+    <div className="product-form-block">
+      <h2>{title}</h2>
+      <div className="form-grid">
+        <label className="field">
+          <span>Product name in Manglish / Malayalam</span>
+          <input
+            lang="en"
+            type="text"
+            value={product.name}
+            onChange={(event) => updateProduct(productIndex, 'name', event.target.value)}
+            placeholder="ari podi"
+          />
+          <strong className="malayalam-preview" lang="ml">{previewName || 'ഉൽപ്പന്നത്തിന്റെ പേര്'}</strong>
+          <span className="transliteration-status">
+            {hasApiProductName ? 'Malayalam suggestion from API' : 'Malayalam preview'}
+          </span>
+        </label>
+
+        <label className="field">
+          <span>Image URL</span>
+          <div className="input-with-icon">
+            <Image size={18} />
+            <input
+              type="url"
+              value={product.imageUrl}
+              onChange={(event) => updateProduct(productIndex, 'imageUrl', event.target.value)}
+              placeholder="https://example.com/product.jpg"
+            />
+          </div>
+        </label>
+
+        <label className="field">
+          <span>Upload photo</span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(event) => updateProductImageFile(productIndex, event.target.files?.[0])}
+          />
+        </label>
+
+        <div className="price-fields">
+          <label className="field">
+            <span>MRP</span>
+            <div className="input-with-icon">
+              <IndianRupee size={18} />
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={product.mrp}
+                onChange={(event) => updateProduct(productIndex, 'mrp', event.target.value)}
+                placeholder="0"
+              />
+            </div>
+          </label>
+
+          <label className="field">
+            <span>Wholesale price</span>
+            <div className="input-with-icon">
+              <IndianRupee size={18} />
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={product.wholesalePrice}
+                onChange={(event) => updateProduct(productIndex, 'wholesalePrice', event.target.value)}
+                placeholder="0"
+              />
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WholesaleOfferPreview({
+  products,
+  visibleProductCount,
+  setImageFailed,
+}) {
+  const visibleProducts = products.map((product, index) => (
+    index < visibleProductCount ? product : EMPTY_WHOLESALE_PRODUCT
+  ));
+
+  return (
+    <section className="print-preview" aria-label="Wholesale offer print preview">
+      <div className="wholesale-sheet">
+        {visibleProducts.map((product, index) => (
+          <PrintWholesaleProductPanel
+            key={index}
+            product={product}
+            productIndex={index}
+            setImageFailed={setImageFailed}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
+  const displayName = product.displayName || ' ';
+  const mrp = product.mrp || '0';
+  const wholesalePrice = product.wholesalePrice || '0';
+  const isEmpty = !product.displayName && !product.printImage && !product.mrp && !product.wholesalePrice;
+
+  if (isEmpty) {
+    return <article className="wholesale-product-panel" />;
+  }
+
+  return (
+    <article className="wholesale-product-panel">
+      <div className="wholesale-product-image-wrap">
+        {product.hasImage && (
+          <img
+            className="wholesale-product-image"
+            src={product.printImage}
+            alt=""
+            onError={() => setImageFailed((current) => ({ ...current, [productIndex]: true }))}
+          />
+        )}
+      </div>
+      <h3 className="wholesale-product-name" lang="ml">{displayName}</h3>
+      <div className="wholesale-product-price-row">
+        <span className="wholesale-product-mrp">₹{mrp}</span>
+        <span className="wholesale-product-wsp">₹{wholesalePrice}</span>
       </div>
     </article>
   );
