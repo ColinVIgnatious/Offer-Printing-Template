@@ -700,12 +700,22 @@ h3 { font-size: 1.5rem; }
 
 .wholesale-product-name {
   width: 100%;
-  margin: 0.2rem 0;
+  margin: 0.2rem 0 0;
   color: #000;
   font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
   font-size: clamp(0.65rem, 1.5vw, 0.95rem);
   font-weight: 900;
   line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.wholesale-product-quantity {
+  width: 100%;
+  margin: 0.1rem 0 0.3rem;
+  color: #000;
+  font-size: clamp(0.55rem, 1.1vw, 0.75rem);
+  font-weight: 700;
   text-align: center;
   overflow-wrap: anywhere;
 }
@@ -897,7 +907,12 @@ h3 { font-size: 1.5rem; }
 
   .wholesale-product-name {
     font-size: 4.5mm;
-    margin: 1mm 0;
+    margin: 1mm 0 0;
+  }
+
+  .wholesale-product-quantity {
+    font-size: 3mm;
+    margin: 0.5mm 0 1.5mm;
   }
 
   .wholesale-product-price-row {

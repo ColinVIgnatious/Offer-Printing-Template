@@ -20,6 +20,7 @@ const EMPTY_WHOLESALE_PRODUCT = {
   name: '',
   imageUrl: '',
   uploadedImage: '',
+  quantity: '',
   mrp: '',
   wholesalePrice: '',
 };
@@ -937,6 +938,16 @@ function WholesaleProductForm({
           />
         </label>
 
+        <label className="field">
+          <span>Quantity</span>
+          <input
+            type="text"
+            value={product.quantity}
+            onChange={(event) => updateProduct(productIndex, 'quantity', event.target.value)}
+            placeholder="1 kg"
+          />
+        </label>
+
         <div className="price-fields">
           <label className="field">
             <span>MRP</span>
@@ -1000,9 +1011,10 @@ function WholesaleOfferPreview({
 
 function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
   const displayName = product.displayName || ' ';
+  const quantity = product.quantity?.trim();
   const mrp = product.mrp || '0';
   const wholesalePrice = product.wholesalePrice || '0';
-  const isEmpty = !product.displayName && !product.printImage && !product.mrp && !product.wholesalePrice;
+  const isEmpty = !product.displayName && !product.printImage && !product.quantity && !product.mrp && !product.wholesalePrice;
 
   if (isEmpty) {
     return <article className="wholesale-product-panel" />;
@@ -1021,6 +1033,7 @@ function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
         )}
       </div>
       <h3 className="wholesale-product-name" lang="ml">{displayName}</h3>
+      {quantity && <p className="wholesale-product-quantity">{quantity}</p>}
       <div className="wholesale-product-price-row">
         <span className="wholesale-product-mrp">₹{mrp}</span>
         <span className="wholesale-product-wsp">₹{wholesalePrice}</span>
