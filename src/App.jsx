@@ -562,6 +562,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
         />
       </main>
 
+      <style>{'@media print { @page { size: A4 landscape; margin: 0; } html, body { width: 297mm; min-height: 210mm; } }'}</style>
     </div>
   );
 }
@@ -883,7 +884,7 @@ function WholesaleOfferPage({ t, i18n, toggleLanguage, navigate }) {
         />
       </main>
 
-      <style>{'@media print { @page { size: A4 portrait; margin: 0; } }'}</style>
+      <style>{'@media print { @page { size: A4 portrait; margin: 0; } html, body { width: 210mm; min-height: 297mm; } }'}</style>
     </div>
   );
 }

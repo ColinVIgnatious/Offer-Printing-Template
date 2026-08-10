@@ -777,16 +777,9 @@ h3 { font-size: 1.5rem; }
 }
 
 @media print {
-  @page {
-    margin: 0;
-    size: A4 landscape;
-  }
-
   html,
   body {
     background: white;
-    width: 297mm;
-    min-height: 210mm;
   }
 
   .no-print {
@@ -878,11 +871,6 @@ h3 { font-size: 1.5rem; }
   .wholesale-offer-page {
     display: block;
     background: white;
-  }
-
-  body:has(.wholesale-offer-page) {
-    width: 210mm;
-    min-height: 297mm;
   }
 
   .wholesale-offer-page .print-builder {
