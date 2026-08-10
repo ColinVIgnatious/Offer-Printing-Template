@@ -1036,8 +1036,8 @@ function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
       <h3 className="wholesale-product-name" lang="ml">{displayName}</h3>
       {quantity && <p className="wholesale-product-quantity">{quantity}</p>}
       <div className="wholesale-product-price-row">
-        <span className="wholesale-product-mrp">₹{mrp}</span>
-        <span className="wholesale-product-wsp">₹{wholesalePrice}</span>
+        <span className="wholesale-product-mrp">MRP {mrp}</span>
+        <span className="wholesale-product-wsp">W. Price {wholesalePrice}</span>
       </div>
     </article>
   );

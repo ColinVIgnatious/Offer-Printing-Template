@@ -734,7 +734,6 @@ h3 { font-size: 1.5rem; }
   color: #000;
   font-size: clamp(0.6rem, 1.2vw, 0.8rem);
   font-weight: 700;
-  text-decoration: line-through;
   white-space: nowrap;
 }
 
