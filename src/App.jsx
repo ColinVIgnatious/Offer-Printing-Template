@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, ShoppingBag, Tag } from 'lucide-react';
+import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, Receipt, ShoppingBag, Tag, User } from 'lucide-react';
 import offers from './data/offers.json';
 
 const PRODUCT_PRINT_PATH = '/product-print';
 const WHOLESALE_PRINT_PATH = '/wholesale-offer';
+const BILL_PRINT_PATH = '/bill-print';
 const WHOLESALE_PRODUCT_COUNT = 12;
 const MALAYALAM_RANGE = /[\u0D00-\u0D7F]/;
 const VIRAMA = '്';
@@ -126,6 +127,17 @@ function App() {
     );
   }
 
+  if (currentPath === BILL_PRINT_PATH) {
+    return (
+      <BillPrintPage
+        t={t}
+        i18n={i18n}
+        toggleLanguage={toggleLanguage}
+        navigate={navigate}
+      />
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Header */}
@@ -144,6 +156,10 @@ function App() {
             <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
               <Package size={18} />
               Wholesale Offer
+            </button>
+            <button className="nav-link" onClick={() => navigate(BILL_PRINT_PATH)}>
+              <Receipt size={18} />
+              Bill Print
             </button>
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
@@ -355,6 +371,14 @@ async function printProductSheet() {
   window.setTimeout(() => window.print(), 100);
 }
 
+function formatBillDate(date) {
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function printBill() {
+  window.setTimeout(() => window.print(), 100);
+}
+
 function imageFileToColorDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -513,6 +537,10 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
             <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
               <Package size={18} />
               Wholesale Offer
+            </button>
+            <button className="nav-link" onClick={() => navigate(BILL_PRINT_PATH)}>
+              <Receipt size={18} />
+              Bill Print
             </button>
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
@@ -836,6 +864,10 @@ function WholesaleOfferPage({ t, i18n, toggleLanguage, navigate }) {
               <Printer size={18} />
               Print Product
             </button>
+            <button className="nav-link" onClick={() => navigate(BILL_PRINT_PATH)}>
+              <Receipt size={18} />
+              Bill Print
+            </button>
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
         </div>
@@ -1040,6 +1072,111 @@ function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
         <span className="wholesale-product-wsp">W. Price {wholesalePrice}</span>
       </div>
     </article>
+  );
+}
+
+function BillPrintPage({ t, i18n, toggleLanguage, navigate }) {
+  const [customerName, setCustomerName] = useState('');
+  const [orderText, setOrderText] = useState('');
+  const billDate = formatBillDate(new Date());
+
+  return (
+    <div className="app-container bill-print-page">
+      <header className="header no-print">
+        <div className="container flex-between">
+          <button className="brand-button" onClick={() => navigate('/')}>
+            <ShoppingBag color="var(--primary)" size={32} />
+            <span className="text-primary">{t('store_name')}</span>
+          </button>
+
+          <div className="header-actions">
+            <button className="nav-link" onClick={() => navigate('/')}>
+              <Home size={18} />
+              Offers
+            </button>
+            <button className="nav-link" onClick={() => navigate(PRODUCT_PRINT_PATH)}>
+              <Printer size={18} />
+              Print Product
+            </button>
+            <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
+              <Package size={18} />
+              Wholesale Offer
+            </button>
+            <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
+          </div>
+        </div>
+      </header>
+
+      <main className="print-builder bill-print-builder">
+        <section className="print-builder-panel no-print">
+          <div className="section-heading">
+            <Receipt size={22} />
+            <div>
+              <h1>Bill Print</h1>
+              <p>Paste an order typed in WhatsApp and print it as an 8cm thermal receipt.</p>
+            </div>
+          </div>
+
+          <div className="form-grid">
+            <label className="field">
+              <span>Customer name</span>
+              <div className="input-with-icon">
+                <User size={18} />
+                <input
+                  type="text"
+                  lang="ml"
+                  value={customerName}
+                  onChange={(event) => setCustomerName(event.target.value)}
+                  placeholder="Customer name"
+                />
+              </div>
+            </label>
+
+            <label className="field">
+              <span>Order details (paste from WhatsApp)</span>
+              <textarea
+                className="bill-order-textarea"
+                lang="ml"
+                value={orderText}
+                onChange={(event) => setOrderText(event.target.value)}
+                placeholder="Paste the order text here..."
+                rows={14}
+              />
+            </label>
+          </div>
+
+          <button className="btn btn-primary print-action" onClick={printBill}>
+            <Printer size={20} />
+            Print
+          </button>
+        </section>
+
+        <BillPrintPreview
+          storeName={t('store_name')}
+          customerName={customerName}
+          orderText={orderText}
+          billDate={billDate}
+        />
+      </main>
+
+      <style>{'@media print { @page { size: 80mm auto; margin: 0; } html, body { width: 80mm; } }'}</style>
+    </div>
+  );
+}
+
+function BillPrintPreview({ storeName, customerName, orderText, billDate }) {
+  return (
+    <section className="print-preview" aria-label="Bill print preview">
+      <div className="bill-sheet">
+        <h2 className="bill-store-name">{storeName}</h2>
+        <div className="bill-meta-row">
+          <span className="bill-customer-name" lang="ml">{customerName}</span>
+          <span className="bill-date">{billDate}</span>
+        </div>
+        <div className="bill-divider" />
+        <pre className="bill-order-body" lang="ml">{orderText}</pre>
+      </div>
+    </section>
   );
 }
 

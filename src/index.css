@@ -317,6 +317,10 @@ h3 { font-size: 1.5rem; }
   align-items: start;
 }
 
+.bill-print-builder {
+  grid-template-columns: minmax(320px, 1.1fr) minmax(280px, 0.75fr);
+}
+
 .print-builder-panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -745,6 +749,77 @@ h3 { font-size: 1.5rem; }
   white-space: nowrap;
 }
 
+.bill-order-textarea {
+  width: 100%;
+  min-height: 220px;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  color: var(--text-dark);
+  font: inherit;
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
+  background: #fff;
+  resize: vertical;
+}
+
+.bill-order-textarea:focus {
+  outline: 3px solid #ffe4e6;
+  border-color: var(--primary);
+}
+
+.bill-sheet {
+  width: min(100%, 320px);
+  background: #fff;
+  border: 1px solid #111;
+  box-shadow: var(--shadow-md);
+  color: #000;
+  padding: 4mm 3mm;
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.bill-store-name {
+  text-align: center;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.bill-meta-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.bill-customer-name {
+  overflow-wrap: anywhere;
+}
+
+.bill-date {
+  white-space: nowrap;
+}
+
+.bill-divider {
+  border-top: 1px dashed #000;
+  margin: 0.5rem 0;
+}
+
+.bill-order-body {
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
 .print-only {
   display: none;
 }
@@ -769,6 +844,12 @@ h3 { font-size: 1.5rem; }
 
   .wholesale-sheet {
     width: 100%;
+  }
+
+  .bill-sheet {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
   }
 
   .price-fields {
@@ -915,5 +996,44 @@ h3 { font-size: 1.5rem; }
 
   .wholesale-product-wsp {
     font-size: 5.5mm;
+  }
+
+  .bill-print-page {
+    display: block;
+    background: white;
+  }
+
+  .bill-print-page .print-builder {
+    display: block;
+    width: 80mm;
+    margin: 0;
+  }
+
+  .bill-print-page .print-preview {
+    display: block;
+  }
+
+  .bill-sheet {
+    width: 80mm;
+    border: 0;
+    box-shadow: none;
+    padding: 3mm;
+  }
+
+  .bill-store-name {
+    font-size: 4.2mm;
+  }
+
+  .bill-meta-row {
+    font-size: 3mm;
+    margin-top: 1.5mm;
+  }
+
+  .bill-divider {
+    margin: 1.5mm 0;
+  }
+
+  .bill-order-body {
+    font-size: 3.2mm;
   }
 }
