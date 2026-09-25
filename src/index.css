@@ -785,6 +785,7 @@ h3 { font-size: 1.5rem; }
   text-align: center;
   font-size: 1.05rem;
   letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .bill-meta-row {
@@ -812,7 +813,7 @@ h3 { font-size: 1.5rem; }
 
 .bill-order-body {
   font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -1034,6 +1035,6 @@ h3 { font-size: 1.5rem; }
   }
 
   .bill-order-body {
-    font-size: 3.2mm;
+    font-size: 4mm;
   }
 }
