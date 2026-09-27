@@ -477,9 +477,173 @@ h3 { font-size: 1.5rem; }
   border-radius: 0.5rem;
 }
 
+.print-mode-toggle {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.print-mode-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.print-mode-option.active {
+  border-color: var(--primary);
+  background: #fff1f2;
+  color: var(--primary);
+}
+
+.print-mode-option input {
+  accent-color: var(--primary);
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+}
+
 .print-preview {
   display: flex;
   justify-content: center;
+}
+
+.thermal-offer-sheet {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.thermal-offer-item {
+  width: min(100%, 320px);
+  background: #fff;
+  border: 1px solid #111;
+  box-shadow: var(--shadow-md);
+  color: #000;
+  padding: 4mm 3mm;
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.thermal-offer-name {
+  font-size: 1.1rem;
+  font-weight: 900;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.thermal-offer-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.thermal-offer-discount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.55rem;
+  border: 2px solid #000;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.thermal-offer-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #000;
+}
+
+.thermal-offer-mrp {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.thermal-offer-offer {
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.print-preview-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.print-preview-modal {
+  width: min(100%, 640px);
+  max-height: min(90vh, 900px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.print-preview-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.print-preview-modal-header h2 {
+  font-size: 1.25rem;
+}
+
+.print-preview-modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--text-light);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0.35rem;
+  border-radius: 0.4rem;
+}
+
+.print-preview-modal-close:hover {
+  color: var(--primary);
+  background: #fff1f2;
+}
+
+.print-preview-modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 1.5rem;
+  background: #f1f5f9;
+}
+
+.print-preview-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
 }
 
 .print-sheet {
@@ -948,6 +1112,47 @@ h3 { font-size: 1.5rem; }
     padding: 0.9mm 2.8mm;
     border-width: 0.7mm;
     font-size: 4.2mm;
+  }
+
+  .product-print-page.print-mode-thermal .print-builder {
+    width: 80mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-sheet {
+    width: 80mm;
+    gap: 0;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-item {
+    width: 80mm;
+    border: 0;
+    box-shadow: none;
+    padding: 3mm;
+    break-after: page;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-item:last-child {
+    break-after: auto;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-name {
+    font-size: 4.5mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-meta {
+    font-size: 3mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-discount {
+    font-size: 2.6mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-mrp {
+    font-size: 3mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-offer-offer {
+    font-size: 6mm;
   }
 
   .wholesale-offer-page {

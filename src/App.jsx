@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, Receipt, ShoppingBag, Tag, User } from 'lucide-react';
+import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, Receipt, ShoppingBag, Tag, User, X } from 'lucide-react';
 import offers from './data/offers.json';
 
 const PRODUCT_PRINT_PATH = '/product-print';
@@ -444,6 +444,8 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
   const [visibleProductCount, setVisibleProductCount] = useState(1);
   const [imageFailed, setImageFailed] = useState({});
   const [apiProductNames, setApiProductNames] = useState({});
+  const [printMode, setPrintMode] = useState('a4');
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   const updateProduct = (index, field, value) => {
     setProducts((current) => current.map((product, productIndex) => (
@@ -520,8 +522,23 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
     };
   });
 
+  const previewContent = printMode === 'thermal' ? (
+    <ThermalOfferPreview products={printableProducts} visibleProductCount={visibleProductCount} />
+  ) : (
+    <ProductPrintPreview
+      products={printableProducts}
+      visibleProductCount={visibleProductCount}
+      setImageFailed={setImageFailed}
+    />
+  );
+
+  const handleConfirmPrint = () => {
+    setShowPreviewModal(false);
+    printProductSheet();
+  };
+
   return (
-    <div className="app-container product-print-page">
+    <div className={`app-container product-print-page print-mode-${printMode}`}>
       <header className="header no-print">
         <div className="container flex-between">
           <button className="brand-button" onClick={() => navigate('/')}>
@@ -553,8 +570,35 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
             <Tag size={22} />
             <div>
               <h1>Product Print</h1>
-              <p>Create a black-and-white landscape A4 offer sheet with up to four products.</p>
+              <p>
+                {printMode === 'thermal'
+                  ? 'Print each offer one by one on an 8cm thermal roll.'
+                  : 'Create a black-and-white landscape A4 offer sheet with up to four products.'}
+              </p>
             </div>
+          </div>
+
+          <div className="print-mode-toggle" role="radiogroup" aria-label="Print size">
+            <label className={`print-mode-option ${printMode === 'a4' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="print-mode"
+                value="a4"
+                checked={printMode === 'a4'}
+                onChange={() => setPrintMode('a4')}
+              />
+              <span>A4 sheet (4 offers)</span>
+            </label>
+            <label className={`print-mode-option ${printMode === 'thermal' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="print-mode"
+                value="thermal"
+                checked={printMode === 'thermal'}
+                onChange={() => setPrintMode('thermal')}
+              />
+              <span>Thermal (8cm, one by one)</span>
+            </label>
           </div>
 
           {products.slice(0, visibleProductCount).map((product, index) => (
@@ -577,20 +621,51 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
             </button>
           )}
 
-          <button className="btn btn-primary print-action" onClick={printProductSheet}>
+          <button className="btn btn-primary print-action" onClick={() => setShowPreviewModal(true)}>
             <Printer size={20} />
-            Print
+            Preview &amp; Print
           </button>
         </section>
 
-        <ProductPrintPreview
-          products={printableProducts}
-          visibleProductCount={visibleProductCount}
-          setImageFailed={setImageFailed}
-        />
+        {previewContent}
       </main>
 
-      <style>{'@media print { @page { size: A4 landscape; margin: 0; } html, body { width: 297mm; min-height: 210mm; } }'}</style>
+      <style>{printMode === 'thermal'
+        ? '@media print { @page { size: 80mm auto; margin: 0; } html, body { width: 80mm; } }'
+        : '@media print { @page { size: A4 landscape; margin: 0; } html, body { width: 297mm; min-height: 210mm; } }'}</style>
+
+      {showPreviewModal && (
+        <PrintPreviewModal onClose={() => setShowPreviewModal(false)} onConfirmPrint={handleConfirmPrint}>
+          {previewContent}
+        </PrintPreviewModal>
+      )}
+    </div>
+  );
+}
+
+function PrintPreviewModal({ children, onClose, onConfirmPrint }) {
+  return (
+    <div className="print-preview-modal-backdrop no-print" role="dialog" aria-modal="true" aria-label="Print preview">
+      <div className="print-preview-modal">
+        <div className="print-preview-modal-header">
+          <h2>Print preview</h2>
+          <button className="print-preview-modal-close" onClick={onClose} aria-label="Close preview">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="print-preview-modal-body">
+          {children}
+        </div>
+
+        <div className="print-preview-modal-footer">
+          <button className="btn btn-outline" onClick={onClose}>Back</button>
+          <button className="btn btn-primary" onClick={onConfirmPrint}>
+            <Printer size={18} />
+            Print
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -758,6 +833,53 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
       <div className="print-product-price-line">
         <span className="print-product-mrp-label">MRP <span className="print-product-mrp-value">₹{mrp}</span></span>
         <span className="print-product-offer">₹{offerPrice}</span>
+      </div>
+    </article>
+  );
+}
+
+function ThermalOfferPreview({ products, visibleProductCount }) {
+  const visibleProducts = products.slice(0, visibleProductCount);
+
+  return (
+    <section className="print-preview" aria-label="Thermal offer print preview">
+      <div className="thermal-offer-sheet">
+        {visibleProducts.map((product, index) => (
+          <ThermalOfferItem key={index} product={product} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ThermalOfferItem({ product }) {
+  const displayName = product.displayName || ' ';
+  const quantity = product.quantity?.trim();
+  const mrp = product.mrp || '0';
+  const offerPrice = product.offerPrice || '0';
+  const mrpNumber = Number(product.mrp);
+  const offerPriceNumber = Number(product.offerPrice);
+  const discountPercent = Number.isFinite(mrpNumber) && Number.isFinite(offerPriceNumber) && mrpNumber > offerPriceNumber
+    ? Math.round(((mrpNumber - offerPriceNumber) / mrpNumber) * 100)
+    : 0;
+  const isEmpty = !product.displayName && !product.quantity && !product.mrp && !product.offerPrice;
+
+  if (isEmpty) {
+    return null;
+  }
+
+  return (
+    <article className="thermal-offer-item">
+      <h3 className="thermal-offer-name" lang="ml">{displayName}</h3>
+      {(quantity || discountPercent > 0) && (
+        <div className="thermal-offer-meta">
+          {quantity && <span>{quantity}</span>}
+          {discountPercent > 0 && <span className="thermal-offer-discount">{discountPercent}% OFF</span>}
+        </div>
+      )}
+      <div className="thermal-offer-price-row">
+        <span className="thermal-offer-mrp">MRP <s>₹{mrp}</s></span>
+        <span className="thermal-offer-offer">₹{offerPrice}</span>
       </div>
     </article>
   );
