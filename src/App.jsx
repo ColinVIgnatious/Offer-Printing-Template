@@ -3,9 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, Receipt, ShoppingBag, Tag, User, X } from 'lucide-react';
 import offers from './data/offers.json';
 
+const HOME_PATH = '/';
 const PRODUCT_PRINT_PATH = '/product-print';
 const WHOLESALE_PRINT_PATH = '/wholesale-offer';
 const BILL_PRINT_PATH = '/bill-print';
+const NAV_TABS = [
+  { path: HOME_PATH, label: 'Offers', Icon: Home },
+  { path: PRODUCT_PRINT_PATH, label: 'Print Product', Icon: Printer },
+  { path: WHOLESALE_PRINT_PATH, label: 'Wholesale Offer', Icon: Package },
+  { path: BILL_PRINT_PATH, label: 'Bill Print', Icon: Receipt },
+];
 const WHOLESALE_PRODUCT_COUNT = 12;
 const MALAYALAM_RANGE = /[\u0D00-\u0D7F]/;
 const VIRAMA = '്';
@@ -149,18 +156,7 @@ function App() {
           </div>
           
           <div className="header-actions">
-            <button className="nav-link" onClick={() => navigate(PRODUCT_PRINT_PATH)}>
-              <Printer size={18} />
-              Print Product
-            </button>
-            <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
-              <Package size={18} />
-              Wholesale Offer
-            </button>
-            <button className="nav-link" onClick={() => navigate(BILL_PRINT_PATH)}>
-              <Receipt size={18} />
-              Bill Print
-            </button>
+            <NavTabs activePath={HOME_PATH} navigate={navigate} />
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
         </div>
@@ -254,13 +250,32 @@ function LanguageToggle({ i18n, toggleLanguage }) {
       >
         EN
       </button>
-      <button 
+      <button
         className={`lang-btn ${i18n.language === 'ml' ? 'active' : ''}`}
         onClick={() => toggleLanguage('ml')}
       >
         മല
       </button>
     </div>
+  );
+}
+
+function NavTabs({ activePath, navigate }) {
+  return (
+    <nav className="nav-tabs" aria-label="Pages">
+      {NAV_TABS.map((tab) => (
+        <button
+          key={tab.path}
+          type="button"
+          className={`nav-tab ${activePath === tab.path ? 'active' : ''}`}
+          aria-current={activePath === tab.path ? 'page' : undefined}
+          onClick={() => navigate(tab.path)}
+        >
+          <tab.Icon size={18} />
+          {tab.label}
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -515,7 +530,8 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
 
     return {
       ...product,
-      displayName: (hasApiProductName ? apiProductName.value : localProductName).trim(),
+      displayName: product.name.trim(),
+      malayalamSuggestion: (hasApiProductName ? apiProductName.value : localProductName).trim(),
       hasApiProductName,
       printImage: product.uploadedImage || product.imageUrl.trim(),
       hasImage: Boolean((product.uploadedImage || product.imageUrl.trim()) && !imageFailed[index]),
@@ -551,18 +567,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
           </button>
 
           <div className="header-actions">
-            <button className="nav-link" onClick={() => navigate('/')}>
-              <Home size={18} />
-              Offers
-            </button>
-            <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
-              <Package size={18} />
-              Wholesale Offer
-            </button>
-            <button className="nav-link" onClick={() => navigate(BILL_PRINT_PATH)}>
-              <Receipt size={18} />
-              Bill Print
-            </button>
+            <NavTabs activePath={PRODUCT_PRINT_PATH} navigate={navigate} />
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
         </div>
@@ -611,7 +616,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
               product={product}
               productIndex={index}
               title={`Product ${index + 1}`}
-              previewName={printableProducts[index].displayName}
+              malayalamSuggestion={printableProducts[index].malayalamSuggestion}
               hasApiProductName={printableProducts[index].hasApiProductName}
               updateProduct={updateProduct}
               updateProductImageFile={updateProductImageFile}
@@ -678,17 +683,19 @@ function ProductForm({
   product,
   productIndex,
   title,
-  previewName,
+  malayalamSuggestion,
   hasApiProductName,
   updateProduct,
   updateProductImageFile,
 }) {
+  const canUseSuggestion = Boolean(malayalamSuggestion) && malayalamSuggestion !== product.name.trim();
+
   return (
     <div className="product-form-block">
       <h2>{title}</h2>
       <div className="form-grid">
         <label className="field">
-          <span>Product name in Manglish / Malayalam</span>
+          <span>Product name (prints exactly as typed)</span>
           <input
             lang="en"
             type="text"
@@ -696,9 +703,20 @@ function ProductForm({
             onChange={(event) => updateProduct(productIndex, 'name', event.target.value)}
             placeholder="ari podi"
           />
-          <strong className="malayalam-preview" lang="ml">{previewName || 'ഉൽപ്പന്നത്തിന്റെ പേര്'}</strong>
+          <div className="malayalam-suggestion-row">
+            <strong className="malayalam-preview" lang="ml">{malayalamSuggestion || 'ഉൽപ്പന്നത്തിന്റെ പേര്'}</strong>
+            {canUseSuggestion && (
+              <button
+                type="button"
+                className="use-malayalam-btn"
+                onClick={() => updateProduct(productIndex, 'name', malayalamSuggestion)}
+              >
+                Use Malayalam
+              </button>
+            )}
+          </div>
           <span className="transliteration-status">
-            {hasApiProductName ? 'Malayalam suggestion from API' : 'Malayalam preview'}
+            {hasApiProductName ? 'Malayalam suggestion from API' : 'Malayalam suggestion'}
           </span>
         </label>
 
@@ -797,6 +815,7 @@ function ProductPrintPreview({
 
 function PrintProductPanel({ product, productIndex, setImageFailed }) {
   const displayName = product.displayName || ' ';
+  const nameLang = MALAYALAM_RANGE.test(displayName) ? 'ml' : 'en';
   const quantity = product.quantity?.trim();
   const mrp = product.mrp || '0';
   const offerPrice = product.offerPrice || '0';
@@ -823,7 +842,7 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
       )}
       <div className="print-product-overlay">
         <div className="print-product-title-block">
-          <h2 lang="ml">{displayName}</h2>
+          <h2 lang={nameLang}>{displayName}</h2>
           {(quantity || discountPercent > 0) && (
             <div className="print-product-meta-line">
               {quantity && <p>{quantity}</p>}
@@ -942,7 +961,8 @@ function WholesaleOfferPage({ t, i18n, toggleLanguage, navigate }) {
 
     return {
       ...product,
-      displayName: (hasApiProductName ? apiProductName.value : localProductName).trim(),
+      displayName: product.name.trim(),
+      malayalamSuggestion: (hasApiProductName ? apiProductName.value : localProductName).trim(),
       hasApiProductName,
       printImage: product.uploadedImage || product.imageUrl.trim(),
       hasImage: Boolean((product.uploadedImage || product.imageUrl.trim()) && !imageFailed[index]),
@@ -959,18 +979,7 @@ function WholesaleOfferPage({ t, i18n, toggleLanguage, navigate }) {
           </button>
 
           <div className="header-actions">
-            <button className="nav-link" onClick={() => navigate('/')}>
-              <Home size={18} />
-              Offers
-            </button>
-            <button className="nav-link" onClick={() => navigate(PRODUCT_PRINT_PATH)}>
-              <Printer size={18} />
-              Print Product
-            </button>
-            <button className="nav-link" onClick={() => navigate(BILL_PRINT_PATH)}>
-              <Receipt size={18} />
-              Bill Print
-            </button>
+            <NavTabs activePath={WHOLESALE_PRINT_PATH} navigate={navigate} />
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
         </div>
@@ -992,7 +1001,7 @@ function WholesaleOfferPage({ t, i18n, toggleLanguage, navigate }) {
               product={product}
               productIndex={index}
               title={`Product ${index + 1}`}
-              previewName={printableProducts[index].displayName}
+              malayalamSuggestion={printableProducts[index].malayalamSuggestion}
               hasApiProductName={printableProducts[index].hasApiProductName}
               updateProduct={updateProduct}
               updateProductImageFile={updateProductImageFile}
@@ -1028,17 +1037,19 @@ function WholesaleProductForm({
   product,
   productIndex,
   title,
-  previewName,
+  malayalamSuggestion,
   hasApiProductName,
   updateProduct,
   updateProductImageFile,
 }) {
+  const canUseSuggestion = Boolean(malayalamSuggestion) && malayalamSuggestion !== product.name.trim();
+
   return (
     <div className="product-form-block">
       <h2>{title}</h2>
       <div className="form-grid">
         <label className="field">
-          <span>Product name in Manglish / Malayalam</span>
+          <span>Product name (prints exactly as typed)</span>
           <input
             lang="en"
             type="text"
@@ -1046,9 +1057,20 @@ function WholesaleProductForm({
             onChange={(event) => updateProduct(productIndex, 'name', event.target.value)}
             placeholder="ari podi"
           />
-          <strong className="malayalam-preview" lang="ml">{previewName || 'ഉൽപ്പന്നത്തിന്റെ പേര്'}</strong>
+          <div className="malayalam-suggestion-row">
+            <strong className="malayalam-preview" lang="ml">{malayalamSuggestion || 'ഉൽപ്പന്നത്തിന്റെ പേര്'}</strong>
+            {canUseSuggestion && (
+              <button
+                type="button"
+                className="use-malayalam-btn"
+                onClick={() => updateProduct(productIndex, 'name', malayalamSuggestion)}
+              >
+                Use Malayalam
+              </button>
+            )}
+          </div>
           <span className="transliteration-status">
-            {hasApiProductName ? 'Malayalam suggestion from API' : 'Malayalam preview'}
+            {hasApiProductName ? 'Malayalam suggestion from API' : 'Malayalam suggestion'}
           </span>
         </label>
 
@@ -1147,6 +1169,7 @@ function WholesaleOfferPreview({
 
 function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
   const displayName = product.displayName || ' ';
+  const nameLang = MALAYALAM_RANGE.test(displayName) ? 'ml' : 'en';
   const quantity = product.quantity?.trim();
   const mrp = product.mrp || '0';
   const wholesalePrice = product.wholesalePrice || '0';
@@ -1168,7 +1191,7 @@ function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
           />
         )}
       </div>
-      <h3 className="wholesale-product-name" lang="ml">{displayName}</h3>
+      <h3 className="wholesale-product-name" lang={nameLang}>{displayName}</h3>
       {quantity && <p className="wholesale-product-quantity">{quantity}</p>}
       <div className="wholesale-product-price-row">
         <span className="wholesale-product-mrp">MRP {mrp}</span>
@@ -1193,18 +1216,7 @@ function BillPrintPage({ t, i18n, toggleLanguage, navigate }) {
           </button>
 
           <div className="header-actions">
-            <button className="nav-link" onClick={() => navigate('/')}>
-              <Home size={18} />
-              Offers
-            </button>
-            <button className="nav-link" onClick={() => navigate(PRODUCT_PRINT_PATH)}>
-              <Printer size={18} />
-              Print Product
-            </button>
-            <button className="nav-link" onClick={() => navigate(WHOLESALE_PRINT_PATH)}>
-              <Package size={18} />
-              Wholesale Offer
-            </button>
+            <NavTabs activePath={BILL_PRINT_PATH} navigate={navigate} />
             <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
           </div>
         </div>

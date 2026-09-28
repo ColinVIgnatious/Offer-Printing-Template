@@ -60,7 +60,7 @@ body {
 }
 
 .brand-button,
-.nav-link {
+.nav-tab {
   border: 0;
   background: transparent;
   color: var(--text-dark);
@@ -76,25 +76,33 @@ body {
   font-weight: 700;
 }
 
-.nav-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  min-height: 2.5rem;
-  padding: 0 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--surface);
-  font-size: 0.95rem;
-  font-weight: 700;
-  box-shadow: var(--shadow-sm);
+.nav-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--border);
 }
 
-.nav-link:hover {
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: -2px;
+  border-bottom: 2px solid transparent;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
   color: var(--primary);
-  border-color: #fecdd3;
-  background: #fff1f2;
+}
+
+.nav-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -411,7 +419,15 @@ h3 { font-size: 1.5rem; }
   border-color: var(--primary);
 }
 
+.malayalam-suggestion-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
 .malayalam-preview {
+  flex: 1;
+  min-width: 0;
   min-height: 2.75rem;
   display: flex;
   align-items: center;
@@ -424,6 +440,24 @@ h3 { font-size: 1.5rem; }
   font-size: 1.25rem;
   line-height: 1.3;
   overflow-wrap: anywhere;
+}
+
+.use-malayalam-btn {
+  flex: 0 0 auto;
+  padding: 0 0.9rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.5rem;
+  background: #fff;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.use-malayalam-btn:hover {
+  background: var(--primary);
+  color: #fff;
 }
 
 .transliteration-status {
