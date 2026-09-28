@@ -523,7 +523,11 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
   });
 
   const previewContent = printMode === 'thermal' ? (
-    <ThermalOfferPreview products={printableProducts} visibleProductCount={visibleProductCount} />
+    <ThermalOfferPreview
+      products={printableProducts}
+      visibleProductCount={visibleProductCount}
+      setImageFailed={setImageFailed}
+    />
   ) : (
     <ProductPrintPreview
       products={printableProducts}
@@ -572,7 +576,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
               <h1>Product Print</h1>
               <p>
                 {printMode === 'thermal'
-                  ? 'Print each offer one by one on an 8cm thermal roll.'
+                  ? 'Print each offer one by one, landscape, at half the width of an A4 landscape sheet.'
                   : 'Create a black-and-white landscape A4 offer sheet with up to four products.'}
               </p>
             </div>
@@ -597,7 +601,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
                 checked={printMode === 'thermal'}
                 onChange={() => setPrintMode('thermal')}
               />
-              <span>Thermal (8cm, one by one)</span>
+              <span>Thermal (half A4, one by one)</span>
             </label>
           </div>
 
@@ -631,7 +635,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
       </main>
 
       <style>{printMode === 'thermal'
-        ? '@media print { @page { size: 80mm auto; margin: 0; } html, body { width: 80mm; } }'
+        ? '@media print { @page { size: 148.5mm 105mm; margin: 0; } html, body { width: 148.5mm; min-height: 105mm; } }'
         : '@media print { @page { size: A4 landscape; margin: 0; } html, body { width: 297mm; min-height: 210mm; } }'}</style>
 
       {showPreviewModal && (
@@ -838,50 +842,27 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
   );
 }
 
-function ThermalOfferPreview({ products, visibleProductCount }) {
+function ThermalOfferPreview({ products, visibleProductCount, setImageFailed }) {
   const visibleProducts = products.slice(0, visibleProductCount);
 
   return (
     <section className="print-preview" aria-label="Thermal offer print preview">
-      <div className="thermal-offer-sheet">
-        {visibleProducts.map((product, index) => (
-          <ThermalOfferItem key={index} product={product} />
-        ))}
+      <div className="thermal-a4-sheet">
+        {visibleProducts.map((product, index) => {
+          const isEmpty = !product.displayName && !product.printImage && !product.quantity && !product.mrp && !product.offerPrice;
+
+          if (isEmpty) {
+            return null;
+          }
+
+          return (
+            <div className="thermal-a4-panel" key={index}>
+              <PrintProductPanel product={product} productIndex={index} setImageFailed={setImageFailed} />
+            </div>
+          );
+        })}
       </div>
     </section>
-  );
-}
-
-function ThermalOfferItem({ product }) {
-  const displayName = product.displayName || ' ';
-  const quantity = product.quantity?.trim();
-  const mrp = product.mrp || '0';
-  const offerPrice = product.offerPrice || '0';
-  const mrpNumber = Number(product.mrp);
-  const offerPriceNumber = Number(product.offerPrice);
-  const discountPercent = Number.isFinite(mrpNumber) && Number.isFinite(offerPriceNumber) && mrpNumber > offerPriceNumber
-    ? Math.round(((mrpNumber - offerPriceNumber) / mrpNumber) * 100)
-    : 0;
-  const isEmpty = !product.displayName && !product.quantity && !product.mrp && !product.offerPrice;
-
-  if (isEmpty) {
-    return null;
-  }
-
-  return (
-    <article className="thermal-offer-item">
-      <h3 className="thermal-offer-name" lang="ml">{displayName}</h3>
-      {(quantity || discountPercent > 0) && (
-        <div className="thermal-offer-meta">
-          {quantity && <span>{quantity}</span>}
-          {discountPercent > 0 && <span className="thermal-offer-discount">{discountPercent}% OFF</span>}
-        </div>
-      )}
-      <div className="thermal-offer-price-row">
-        <span className="thermal-offer-mrp">MRP <s>₹{mrp}</s></span>
-        <span className="thermal-offer-offer">₹{offerPrice}</span>
-      </div>
-    </article>
   );
 }
 
