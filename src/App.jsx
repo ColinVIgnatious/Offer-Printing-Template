@@ -953,14 +953,14 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
       <h3 className={`thermal-receipt-name ${emphasizeLayout ? 'thermal-receipt-name-emphasis' : ''}`} lang={nameLang}>
         {displayName}
       </h3>
-      {(quantity || discountPercent > 0) && (
+      {discountPercent > 0 && (
         <div className="thermal-receipt-meta">
-          {quantity && <span>{quantity}</span>}
-          {discountPercent > 0 && <span className="thermal-receipt-discount">{discountPercent}% OFF</span>}
+          <span className="thermal-receipt-discount">{discountPercent}% OFF</span>
         </div>
       )}
-      {(thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
+      {(quantity || thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
         <div className={`thermal-receipt-price-row ${emphasizeLayout ? 'thermal-receipt-price-row-emphasis' : ''}`}>
+          {quantity && <span className="thermal-receipt-quantity">{quantity}</span>}
           {thermalOptions.showMrp && (
             <span className="thermal-receipt-mrp">
               MRP {showBothPrices ? <s>₹{mrp}</s> : `₹${mrp}`}
