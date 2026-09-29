@@ -461,6 +461,15 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
   const [apiProductNames, setApiProductNames] = useState({});
   const [printMode, setPrintMode] = useState('a4');
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [thermalOptions, setThermalOptions] = useState({
+    showMrp: true,
+    showOfferPrice: true,
+    showImage: false,
+  });
+
+  const toggleThermalOption = (field) => {
+    setThermalOptions((current) => ({ ...current, [field]: !current[field] }));
+  };
 
   const updateProduct = (index, field, value) => {
     setProducts((current) => current.map((product, productIndex) => (
@@ -542,6 +551,8 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
     <ThermalOfferPreview
       products={printableProducts}
       visibleProductCount={visibleProductCount}
+      setImageFailed={setImageFailed}
+      thermalOptions={thermalOptions}
     />
   ) : (
     <ProductPrintPreview
@@ -608,6 +619,35 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
               <span>Thermal (8cm, one by one)</span>
             </label>
           </div>
+
+          {printMode === 'thermal' && (
+            <div className="thermal-fields-toggle" role="group" aria-label="Thermal receipt fields">
+              <label className={`thermal-field-option ${thermalOptions.showMrp ? 'active' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={thermalOptions.showMrp}
+                  onChange={() => toggleThermalOption('showMrp')}
+                />
+                <span>MRP</span>
+              </label>
+              <label className={`thermal-field-option ${thermalOptions.showOfferPrice ? 'active' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={thermalOptions.showOfferPrice}
+                  onChange={() => toggleThermalOption('showOfferPrice')}
+                />
+                <span>Offer price</span>
+              </label>
+              <label className={`thermal-field-option ${thermalOptions.showImage ? 'active' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={thermalOptions.showImage}
+                  onChange={() => toggleThermalOption('showImage')}
+                />
+                <span>Image</span>
+              </label>
+            </div>
+          )}
 
           {products.slice(0, visibleProductCount).map((product, index) => (
             <ProductForm
@@ -860,21 +900,27 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
   );
 }
 
-function ThermalOfferPreview({ products, visibleProductCount }) {
+function ThermalOfferPreview({ products, visibleProductCount, setImageFailed, thermalOptions }) {
   const visibleProducts = products.slice(0, visibleProductCount);
 
   return (
     <section className="print-preview" aria-label="Thermal offer print preview">
       <div className="thermal-receipt-sheet">
         {visibleProducts.map((product, index) => (
-          <ThermalOfferItem key={index} product={product} />
+          <ThermalOfferItem
+            key={index}
+            product={product}
+            productIndex={index}
+            setImageFailed={setImageFailed}
+            thermalOptions={thermalOptions}
+          />
         ))}
       </div>
     </section>
   );
 }
 
-function ThermalOfferItem({ product }) {
+function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOptions }) {
   const displayName = product.displayName || ' ';
   const nameLang = MALAYALAM_RANGE.test(displayName) ? 'ml' : 'en';
   const quantity = product.quantity?.trim();
@@ -882,10 +928,12 @@ function ThermalOfferItem({ product }) {
   const offerPrice = product.offerPrice || '0';
   const mrpNumber = Number(product.mrp);
   const offerPriceNumber = Number(product.offerPrice);
-  const discountPercent = Number.isFinite(mrpNumber) && Number.isFinite(offerPriceNumber) && mrpNumber > offerPriceNumber
+  const showBothPrices = thermalOptions.showMrp && thermalOptions.showOfferPrice;
+  const discountPercent = showBothPrices && Number.isFinite(mrpNumber) && Number.isFinite(offerPriceNumber) && mrpNumber > offerPriceNumber
     ? Math.round(((mrpNumber - offerPriceNumber) / mrpNumber) * 100)
     : 0;
-  const isEmpty = !product.displayName && !product.quantity && !product.mrp && !product.offerPrice;
+  const showImage = thermalOptions.showImage && product.hasImage;
+  const isEmpty = !product.displayName && !product.quantity && !product.mrp && !product.offerPrice && !showImage;
 
   if (isEmpty) {
     return null;
@@ -893,6 +941,14 @@ function ThermalOfferItem({ product }) {
 
   return (
     <article className="thermal-receipt-item">
+      {showImage && (
+        <img
+          className="thermal-receipt-image"
+          src={product.printImage}
+          alt=""
+          onError={() => setImageFailed((current) => ({ ...current, [productIndex]: true }))}
+        />
+      )}
       <h3 className="thermal-receipt-name" lang={nameLang}>{displayName}</h3>
       {(quantity || discountPercent > 0) && (
         <div className="thermal-receipt-meta">
@@ -900,10 +956,18 @@ function ThermalOfferItem({ product }) {
           {discountPercent > 0 && <span className="thermal-receipt-discount">{discountPercent}% OFF</span>}
         </div>
       )}
-      <div className="thermal-receipt-price-row">
-        <span className="thermal-receipt-mrp">MRP <s>₹{mrp}</s></span>
-        <span className="thermal-receipt-offer">₹{offerPrice}</span>
-      </div>
+      {(thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
+        <div className="thermal-receipt-price-row">
+          {thermalOptions.showMrp && (
+            <span className="thermal-receipt-mrp">
+              MRP {showBothPrices ? <s>₹{mrp}</s> : `₹${mrp}`}
+            </span>
+          )}
+          {thermalOptions.showOfferPrice && (
+            <span className="thermal-receipt-offer">₹{offerPrice}</span>
+          )}
+        </div>
+      )}
     </article>
   );
 }
