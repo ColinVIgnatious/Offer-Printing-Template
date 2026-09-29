@@ -1256,6 +1256,8 @@ h3 { font-size: 1.5rem; }
   }
 
   .product-print-page.print-mode-thermal .thermal-receipt-price-block {
+    height: 60mm;
+    align-self: center;
     gap: 1mm;
     padding-left: 5mm;
   }
