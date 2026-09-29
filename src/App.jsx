@@ -679,7 +679,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
       </main>
 
       <style>{printMode === 'thermal'
-        ? '@media print { @page { size: 80mm auto; margin: 0; } html, body { width: 80mm; } }'
+        ? '@media print { @page { size: auto 80mm; margin: 0; } html, body { height: 80mm; } }'
         : '@media print { @page { size: A4 landscape; margin: 0; } html, body { width: 297mm; min-height: 210mm; } }'}</style>
 
       {showPreviewModal && (
@@ -934,7 +934,6 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
     : 0;
   const showImage = thermalOptions.showImage && product.hasImage;
   const isEmpty = !product.displayName && !product.quantity && !product.mrp && !product.offerPrice && !showImage;
-  const emphasizeLayout = !thermalOptions.showMrp && !thermalOptions.showImage;
 
   if (isEmpty) {
     return null;
@@ -950,26 +949,24 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
           onError={() => setImageFailed((current) => ({ ...current, [productIndex]: true }))}
         />
       )}
-      <h3 className={`thermal-receipt-name ${emphasizeLayout ? 'thermal-receipt-name-emphasis' : ''}`} lang={nameLang}>
-        {displayName}
-      </h3>
-      {discountPercent > 0 && (
-        <div className="thermal-receipt-meta">
-          <span className="thermal-receipt-discount">{discountPercent}% OFF</span>
-        </div>
-      )}
-      {(quantity || thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
-        <div className="thermal-receipt-price-row">
-          {quantity && <span className="thermal-receipt-quantity">{quantity}</span>}
+      <div className="thermal-receipt-name-block">
+        <h3 className="thermal-receipt-name" lang={nameLang}>{displayName}</h3>
+        {(quantity || discountPercent > 0) && (
+          <div className="thermal-receipt-meta">
+            {quantity && <span className="thermal-receipt-quantity">{quantity}</span>}
+            {discountPercent > 0 && <span className="thermal-receipt-discount">{discountPercent}% OFF</span>}
+          </div>
+        )}
+      </div>
+      {(thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
+        <div className="thermal-receipt-price-block">
           {thermalOptions.showMrp && (
             <span className="thermal-receipt-mrp">
               MRP {showBothPrices ? <s>₹{mrp}</s> : `₹${mrp}`}
             </span>
           )}
           {thermalOptions.showOfferPrice && (
-            <span className={`thermal-receipt-offer ${emphasizeLayout ? 'thermal-receipt-offer-emphasis' : ''}`}>
-              ₹{offerPrice}
-            </span>
+            <span className="thermal-receipt-offer">₹{offerPrice}</span>
           )}
         </div>
       )}
