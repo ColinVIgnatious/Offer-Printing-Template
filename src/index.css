@@ -651,6 +651,10 @@ h3 { font-size: 1.5rem; }
   border-top: 1px dashed #000;
 }
 
+.thermal-receipt-price-row-emphasis {
+  justify-content: center;
+}
+
 .thermal-receipt-mrp {
   font-size: 0.95rem;
   font-weight: 700;
@@ -659,6 +663,11 @@ h3 { font-size: 1.5rem; }
 .thermal-receipt-offer {
   font-size: 2.1rem;
   font-weight: 900;
+}
+
+.thermal-receipt-offer-emphasis {
+  font-size: 4rem;
+  line-height: 1;
 }
 
 .print-preview-modal-backdrop {
@@ -1237,6 +1246,10 @@ h3 { font-size: 1.5rem; }
 
   .product-print-page.print-mode-thermal .thermal-receipt-offer {
     font-size: 11mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-receipt-offer-emphasis {
+    font-size: 40mm;
   }
 
   .wholesale-offer-page {
