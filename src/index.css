@@ -621,7 +621,7 @@ h3 { font-size: 1.5rem; }
 }
 
 .thermal-receipt-name-emphasis {
-  letter-spacing: 0.14em;
+  font-size: 3rem;
 }
 
 .thermal-receipt-meta {
@@ -655,10 +655,6 @@ h3 { font-size: 1.5rem; }
   border-top: 1px dashed #000;
 }
 
-.thermal-receipt-price-row-emphasis {
-  justify-content: center;
-}
-
 .thermal-receipt-quantity {
   font-size: 0.95rem;
   font-weight: 700;
@@ -672,6 +668,10 @@ h3 { font-size: 1.5rem; }
 .thermal-receipt-offer {
   font-size: 2.1rem;
   font-weight: 900;
+}
+
+.thermal-receipt-offer-emphasis {
+  font-size: 4.5rem;
 }
 
 .print-preview-modal-backdrop {
@@ -1236,6 +1236,10 @@ h3 { font-size: 1.5rem; }
     font-size: 10mm;
   }
 
+  .product-print-page.print-mode-thermal .thermal-receipt-name-emphasis {
+    font-size: 32mm;
+  }
+
   .product-print-page.print-mode-thermal .thermal-receipt-meta {
     font-size: 4.5mm;
   }
@@ -1254,6 +1258,10 @@ h3 { font-size: 1.5rem; }
 
   .product-print-page.print-mode-thermal .thermal-receipt-offer {
     font-size: 11mm;
+  }
+
+  .product-print-page.print-mode-thermal .thermal-receipt-offer-emphasis {
+    font-size: 48mm;
   }
 
   .wholesale-offer-page {

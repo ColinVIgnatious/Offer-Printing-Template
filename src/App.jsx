@@ -959,7 +959,7 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
         </div>
       )}
       {(quantity || thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
-        <div className={`thermal-receipt-price-row ${emphasizeLayout ? 'thermal-receipt-price-row-emphasis' : ''}`}>
+        <div className="thermal-receipt-price-row">
           {quantity && <span className="thermal-receipt-quantity">{quantity}</span>}
           {thermalOptions.showMrp && (
             <span className="thermal-receipt-mrp">
@@ -967,7 +967,9 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
             </span>
           )}
           {thermalOptions.showOfferPrice && (
-            <span className="thermal-receipt-offer">₹{offerPrice}</span>
+            <span className={`thermal-receipt-offer ${emphasizeLayout ? 'thermal-receipt-offer-emphasis' : ''}`}>
+              ₹{offerPrice}
+            </span>
           )}
         </div>
       )}
