@@ -934,7 +934,7 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
     : 0;
   const showImage = thermalOptions.showImage && product.hasImage;
   const isEmpty = !product.displayName && !product.quantity && !product.mrp && !product.offerPrice && !showImage;
-  const emphasizeOfferPrice = thermalOptions.showOfferPrice && !thermalOptions.showMrp && !thermalOptions.showImage;
+  const emphasizeLayout = !thermalOptions.showMrp && !thermalOptions.showImage;
 
   if (isEmpty) {
     return null;
@@ -950,7 +950,9 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
           onError={() => setImageFailed((current) => ({ ...current, [productIndex]: true }))}
         />
       )}
-      <h3 className="thermal-receipt-name" lang={nameLang}>{displayName}</h3>
+      <h3 className={`thermal-receipt-name ${emphasizeLayout ? 'thermal-receipt-name-emphasis' : ''}`} lang={nameLang}>
+        {displayName}
+      </h3>
       {(quantity || discountPercent > 0) && (
         <div className="thermal-receipt-meta">
           {quantity && <span>{quantity}</span>}
@@ -958,16 +960,14 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
         </div>
       )}
       {(thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
-        <div className={`thermal-receipt-price-row ${emphasizeOfferPrice ? 'thermal-receipt-price-row-emphasis' : ''}`}>
+        <div className={`thermal-receipt-price-row ${emphasizeLayout ? 'thermal-receipt-price-row-emphasis' : ''}`}>
           {thermalOptions.showMrp && (
             <span className="thermal-receipt-mrp">
               MRP {showBothPrices ? <s>₹{mrp}</s> : `₹${mrp}`}
             </span>
           )}
           {thermalOptions.showOfferPrice && (
-            <span className={`thermal-receipt-offer ${emphasizeOfferPrice ? 'thermal-receipt-offer-emphasis' : ''}`}>
-              ₹{offerPrice}
-            </span>
+            <span className="thermal-receipt-offer">₹{offerPrice}</span>
           )}
         </div>
       )}
