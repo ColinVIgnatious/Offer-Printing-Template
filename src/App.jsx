@@ -961,9 +961,7 @@ function ThermalOfferItem({ product, productIndex, setImageFailed, thermalOption
       {(thermalOptions.showMrp || thermalOptions.showOfferPrice) && (
         <div className="thermal-receipt-price-block">
           {thermalOptions.showMrp && (
-            <span className="thermal-receipt-mrp">
-              MRP {showBothPrices ? <s>₹{mrp}</s> : `₹${mrp}`}
-            </span>
+            <span className="thermal-receipt-mrp">MRP ₹{mrp}</span>
           )}
           {thermalOptions.showOfferPrice && (
             <span className="thermal-receipt-offer">₹{offerPrice}</span>

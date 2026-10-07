@@ -628,7 +628,8 @@ h3 { font-size: 1.5rem; }
   font-size: 3.15rem;
   font-weight: 900;
   line-height: 1.1;
-  white-space: nowrap;
+  max-width: 35rem;
+  overflow-wrap: anywhere;
 }
 
 .thermal-receipt-meta {
@@ -1241,6 +1242,7 @@ h3 { font-size: 1.5rem; }
 
   .product-print-page.print-mode-thermal .thermal-receipt-name {
     font-size: 18mm;
+    max-width: 200mm;
   }
 
   .product-print-page.print-mode-thermal .thermal-receipt-meta {
