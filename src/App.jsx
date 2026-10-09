@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Home, Image, IndianRupee, MapPin, Package, Phone, Plus, Printer, Receipt, ShoppingBag, Tag, User, X } from 'lucide-react';
+import { CalendarRange, Home, Image, IndianRupee, MapPin, Megaphone, Package, Phone, Plus, Printer, Receipt, ShoppingBag, Tag, User, X } from 'lucide-react';
 import offers from './data/offers.json';
 
 const HOME_PATH = '/';
 const PRODUCT_PRINT_PATH = '/product-print';
 const WHOLESALE_PRINT_PATH = '/wholesale-offer';
 const BILL_PRINT_PATH = '/bill-print';
+const NOTICE_PRINT_PATH = '/notice-print';
 const NAV_TABS = [
   { path: HOME_PATH, label: 'Offers', Icon: Home },
   { path: PRODUCT_PRINT_PATH, label: 'Print Product', Icon: Printer },
   { path: WHOLESALE_PRINT_PATH, label: 'Wholesale Offer', Icon: Package },
+  { path: NOTICE_PRINT_PATH, label: 'Notice Print', Icon: Megaphone },
   { path: BILL_PRINT_PATH, label: 'Bill Print', Icon: Receipt },
 ];
 const WHOLESALE_PRODUCT_COUNT = 12;
@@ -126,6 +128,17 @@ function App() {
   if (currentPath === WHOLESALE_PRINT_PATH) {
     return (
       <WholesaleOfferPage
+        t={t}
+        i18n={i18n}
+        toggleLanguage={toggleLanguage}
+        navigate={navigate}
+      />
+    );
+  }
+
+  if (currentPath === NOTICE_PRINT_PATH) {
+    return (
+      <NoticePrintPage
         t={t}
         i18n={i18n}
         toggleLanguage={toggleLanguage}
@@ -392,6 +405,20 @@ function formatBillDate(date) {
 
 function printBill() {
   window.setTimeout(() => window.print(), 100);
+}
+
+function formatOfferDate(value) {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function imageFileToColorDataUrl(file) {
@@ -1283,6 +1310,249 @@ function PrintWholesaleProductPanel({ product, productIndex, setImageFailed }) {
       <div className="wholesale-product-price-row">
         <span className="wholesale-product-mrp">MRP {mrp}</span>
         <span className="wholesale-product-wsp">W. Price {wholesalePrice}</span>
+      </div>
+    </article>
+  );
+}
+
+function NoticePrintPage({ t, i18n, toggleLanguage, navigate }) {
+  const [products, setProducts] = useState(() => (
+    Array.from({ length: WHOLESALE_PRODUCT_COUNT }, () => ({ ...EMPTY_WHOLESALE_PRODUCT }))
+  ));
+  const [visibleProductCount, setVisibleProductCount] = useState(1);
+  const [imageFailed, setImageFailed] = useState({});
+  const [apiProductNames, setApiProductNames] = useState({});
+  const [offerFrom, setOfferFrom] = useState('');
+  const [offerTo, setOfferTo] = useState('');
+
+  const updateProduct = (index, field, value) => {
+    setProducts((current) => current.map((product, productIndex) => (
+      productIndex === index ? { ...product, [field]: value } : product
+    )));
+
+    if (field === 'imageUrl' || field === 'uploadedImage') {
+      setImageFailed((current) => ({ ...current, [index]: false }));
+    }
+  };
+
+  const updateProductImageFile = (index, file) => {
+    if (!file) {
+      return;
+    }
+
+    imageFileToColorDataUrl(file)
+      .then((imageDataUrl) => {
+        updateProduct(index, 'uploadedImage', imageDataUrl);
+      })
+      .catch(() => {
+        setImageFailed((current) => ({ ...current, [index]: true }));
+      });
+  };
+
+  useEffect(() => {
+    const controllers = [];
+    const timeoutId = window.setTimeout(() => {
+      products.forEach((product, index) => {
+        const typedName = product.name.trim();
+
+        if (!typedName || MALAYALAM_RANGE.test(product.name)) {
+          return;
+        }
+
+        const controller = new AbortController();
+        controllers.push(controller);
+
+        transliterateWithApi(product.name, controller.signal)
+          .then((transliteratedName) => {
+            setApiProductNames((current) => ({
+              ...current,
+              [index]: { raw: product.name, value: transliteratedName },
+            }));
+          })
+          .catch((error) => {
+            if (error.name !== 'AbortError') {
+              setApiProductNames((current) => ({
+                ...current,
+                [index]: { raw: '', value: '' },
+              }));
+            }
+          });
+      });
+    }, 250);
+
+    return () => {
+      controllers.forEach((controller) => controller.abort());
+      window.clearTimeout(timeoutId);
+    };
+  }, [products]);
+
+  const printableProducts = products.map((product, index) => {
+    const apiProductName = apiProductNames[index];
+    const hasApiProductName = apiProductName?.raw === product.name;
+    const localProductName = manglishToMalayalam(product.name);
+
+    return {
+      ...product,
+      displayName: product.name.trim(),
+      malayalamSuggestion: (hasApiProductName ? apiProductName.value : localProductName).trim(),
+      hasApiProductName,
+      printImage: product.uploadedImage || product.imageUrl.trim(),
+      hasImage: Boolean((product.uploadedImage || product.imageUrl.trim()) && !imageFailed[index]),
+    };
+  });
+
+  return (
+    <div className="app-container notice-print-page">
+      <header className="header no-print">
+        <div className="container flex-between">
+          <button className="brand-button" onClick={() => navigate('/')}>
+            <ShoppingBag color="var(--primary)" size={32} />
+            <span className="text-primary">{t('store_name')}</span>
+          </button>
+
+          <div className="header-actions">
+            <NavTabs activePath={NOTICE_PRINT_PATH} navigate={navigate} />
+            <LanguageToggle i18n={i18n} toggleLanguage={toggleLanguage} />
+          </div>
+        </div>
+      </header>
+
+      <main className="print-builder">
+        <section className="print-builder-panel no-print">
+          <div className="section-heading">
+            <Megaphone size={22} />
+            <div>
+              <h1>Notice Print</h1>
+              <p>Create a colour A4 notice with a dated offer heading, followed by up to {WHOLESALE_PRODUCT_COUNT} products, 3 columns by 4 rows.</p>
+            </div>
+          </div>
+
+          <div className="notice-date-fields">
+            <label className="field">
+              <span>Offer from</span>
+              <div className="input-with-icon">
+                <CalendarRange size={18} />
+                <input
+                  type="date"
+                  value={offerFrom}
+                  onChange={(event) => setOfferFrom(event.target.value)}
+                />
+              </div>
+            </label>
+
+            <label className="field">
+              <span>Offer to</span>
+              <div className="input-with-icon">
+                <CalendarRange size={18} />
+                <input
+                  type="date"
+                  value={offerTo}
+                  onChange={(event) => setOfferTo(event.target.value)}
+                />
+              </div>
+            </label>
+          </div>
+
+          {products.slice(0, visibleProductCount).map((product, index) => (
+            <WholesaleProductForm
+              key={index}
+              product={product}
+              productIndex={index}
+              title={`Product ${index + 1}`}
+              malayalamSuggestion={printableProducts[index].malayalamSuggestion}
+              hasApiProductName={printableProducts[index].hasApiProductName}
+              updateProduct={updateProduct}
+              updateProductImageFile={updateProductImageFile}
+            />
+          ))}
+
+          {visibleProductCount < products.length && (
+            <button className="add-product-btn" onClick={() => setVisibleProductCount((count) => count + 1)}>
+              <Plus size={18} />
+              Add product {visibleProductCount + 1}
+            </button>
+          )}
+
+          <button className="btn btn-primary print-action" onClick={printProductSheet}>
+            <Printer size={20} />
+            Print
+          </button>
+        </section>
+
+        <NoticePreview
+          storeName={t('store_name')}
+          offerFrom={formatOfferDate(offerFrom)}
+          offerTo={formatOfferDate(offerTo)}
+          products={printableProducts}
+          visibleProductCount={visibleProductCount}
+          setImageFailed={setImageFailed}
+        />
+      </main>
+
+      <style>{'@media print { @page { size: A4 portrait; margin: 0; } html, body { width: 210mm; min-height: 297mm; } }'}</style>
+    </div>
+  );
+}
+
+function NoticePreview({ storeName, offerFrom, offerTo, products, visibleProductCount, setImageFailed }) {
+  const visibleProducts = products.map((product, index) => (
+    index < visibleProductCount ? product : EMPTY_WHOLESALE_PRODUCT
+  ));
+  const hasDates = Boolean(offerFrom && offerTo);
+
+  return (
+    <section className="print-preview" aria-label="Notice print preview">
+      <div className="notice-sheet">
+        <div className="notice-header">
+          <h2 className="notice-store-name">{storeName}</h2>
+          <p className={`notice-date-range ${hasDates ? '' : 'is-placeholder'}`}>
+            {hasDates ? `Offer valid ${offerFrom} – ${offerTo}` : 'Offer valid DD MMM YYYY – DD MMM YYYY'}
+          </p>
+        </div>
+        <div className="notice-grid">
+          {visibleProducts.map((product, index) => (
+            <NoticeProductPanel
+              key={index}
+              product={product}
+              productIndex={index}
+              setImageFailed={setImageFailed}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NoticeProductPanel({ product, productIndex, setImageFailed }) {
+  const displayName = product.displayName || ' ';
+  const nameLang = MALAYALAM_RANGE.test(displayName) ? 'ml' : 'en';
+  const quantity = product.quantity?.trim();
+  const mrp = product.mrp || '0';
+  const wholesalePrice = product.wholesalePrice || '0';
+  const isEmpty = !product.displayName && !product.printImage && !product.quantity && !product.mrp && !product.wholesalePrice;
+
+  if (isEmpty) {
+    return <article className="notice-product-panel" />;
+  }
+
+  return (
+    <article className="notice-product-panel">
+      <div className="notice-product-image-wrap">
+        {product.hasImage && (
+          <img
+            className="notice-product-image"
+            src={product.printImage}
+            alt=""
+            onError={() => setImageFailed((current) => ({ ...current, [productIndex]: true }))}
+          />
+        )}
+      </div>
+      <h3 className="notice-product-name" lang={nameLang}>{displayName}</h3>
+      {quantity && <p className="notice-product-quantity">{quantity}</p>}
+      <div className="notice-product-price-row">
+        <span className="notice-product-mrp">MRP {mrp}</span>
+        <span className="notice-product-wsp">W. Price {wholesalePrice}</span>
       </div>
     </article>
   );

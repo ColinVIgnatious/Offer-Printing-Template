@@ -1012,6 +1012,148 @@ h3 { font-size: 1.5rem; }
   white-space: nowrap;
 }
 
+.notice-date-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.notice-sheet {
+  width: min(100%, 620px);
+  aspect-ratio: 210 / 297;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  color: #000;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.notice-header {
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--primary) 0%, #ff1f5a 100%);
+  color: #fff;
+  text-align: center;
+  padding: 0.75rem 1rem;
+}
+
+.notice-store-name {
+  color: #fff;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.notice-date-range {
+  margin-top: 0.25rem;
+  font-size: clamp(0.75rem, 1.6vw, 0.95rem);
+  font-weight: 700;
+  color: #fff;
+}
+
+.notice-date-range.is-placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.notice-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+
+.notice-product-panel {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border-right: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
+  padding: 0.5rem;
+}
+
+.notice-product-panel:nth-child(3n) {
+  border-right: 0;
+}
+
+.notice-product-panel:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+.notice-product-image-wrap {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.notice-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.notice-product-name {
+  width: 100%;
+  margin: 0.2rem 0 0;
+  color: var(--text-dark);
+  font-family: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  font-size: clamp(0.65rem, 1.5vw, 0.95rem);
+  font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.notice-product-quantity {
+  width: 100%;
+  margin: 0.1rem 0 0.3rem;
+  color: var(--text-light);
+  font-size: clamp(0.55rem, 1.1vw, 0.75rem);
+  font-weight: 700;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.notice-product-price-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border: 2px solid var(--primary);
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.4rem;
+  background: #fff1f2;
+}
+
+.notice-product-mrp {
+  color: var(--text-light);
+  font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.notice-product-wsp {
+  color: var(--primary);
+  font-size: clamp(0.85rem, 2vw, 1.2rem);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .bill-order-textarea {
   width: 100%;
   min-height: 220px;
@@ -1110,6 +1252,10 @@ h3 { font-size: 1.5rem; }
     width: 100%;
   }
 
+  .notice-sheet {
+    width: 100%;
+  }
+
   .bill-sheet {
     width: 100%;
     max-width: 320px;
@@ -1117,6 +1263,10 @@ h3 { font-size: 1.5rem; }
   }
 
   .price-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-date-fields {
     grid-template-columns: 1fr;
   }
 }
@@ -1318,6 +1468,69 @@ h3 { font-size: 1.5rem; }
   }
 
   .wholesale-product-wsp {
+    font-size: 5.5mm;
+  }
+
+  .notice-print-page {
+    display: block;
+    background: white;
+  }
+
+  .notice-print-page .print-builder {
+    width: 210mm;
+  }
+
+  .notice-sheet {
+    width: 210mm;
+    height: 297mm;
+    aspect-ratio: auto;
+    border: 0;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .notice-header {
+    height: 25mm;
+    padding: 0 8mm;
+    justify-content: center;
+  }
+
+  .notice-store-name {
+    font-size: 7mm;
+  }
+
+  .notice-date-range {
+    font-size: 4mm;
+    margin-top: 1.5mm;
+  }
+
+  .notice-product-panel {
+    height: 68mm;
+    break-inside: avoid;
+    padding: 4mm;
+  }
+
+  .notice-product-name {
+    font-size: 4.5mm;
+    margin: 1mm 0 0;
+  }
+
+  .notice-product-quantity {
+    font-size: 3mm;
+    margin: 0.5mm 0 1.5mm;
+  }
+
+  .notice-product-price-row {
+    gap: 0.5mm;
+    padding: 1mm 2.5mm;
+    border-width: 0.6mm;
+  }
+
+  .notice-product-mrp {
+    font-size: 3mm;
+  }
+
+  .notice-product-wsp {
     font-size: 5.5mm;
   }
 
