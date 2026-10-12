@@ -488,6 +488,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
   const [apiProductNames, setApiProductNames] = useState({});
   const [printMode, setPrintMode] = useState('a4');
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [thermalLayout, setThermalLayout] = useState('one');
   const [thermalOptions, setThermalOptions] = useState({
     showMrp: true,
     showOfferPrice: true,
@@ -580,6 +581,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
       visibleProductCount={visibleProductCount}
       setImageFailed={setImageFailed}
       thermalOptions={thermalOptions}
+      thermalLayout={thermalLayout}
     />
   ) : (
     <ProductPrintPreview
@@ -595,7 +597,7 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
   };
 
   return (
-    <div className={`app-container product-print-page print-mode-${printMode}`}>
+    <div className={`app-container product-print-page print-mode-${printMode} thermal-layout-${thermalLayout}`}>
       <header className="header no-print">
         <div className="container flex-between">
           <button className="brand-button" onClick={() => navigate('/')}>
@@ -648,6 +650,31 @@ function ProductPrintPage({ t, i18n, toggleLanguage, navigate }) {
           </div>
 
           {printMode === 'thermal' && (
+            <div className="print-mode-toggle" role="radiogroup" aria-label="Thermal layout">
+              <label className={`print-mode-option ${thermalLayout === 'one' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="thermal-layout"
+                  value="one"
+                  checked={thermalLayout === 'one'}
+                  onChange={() => setThermalLayout('one')}
+                />
+                <span>Mode 1 (image &amp; details)</span>
+              </label>
+              <label className={`print-mode-option ${thermalLayout === 'two' ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="thermal-layout"
+                  value="two"
+                  checked={thermalLayout === 'two'}
+                  onChange={() => setThermalLayout('two')}
+                />
+                <span>Mode 2 (price on top, name below)</span>
+              </label>
+            </div>
+          )}
+
+          {printMode === 'thermal' && thermalLayout === 'one' && (
             <div className="thermal-fields-toggle" role="group" aria-label="Thermal receipt fields">
               <label className={`thermal-field-option ${thermalOptions.showMrp ? 'active' : ''}`}>
                 <input
@@ -927,23 +954,49 @@ function PrintProductPanel({ product, productIndex, setImageFailed }) {
   );
 }
 
-function ThermalOfferPreview({ products, visibleProductCount, setImageFailed, thermalOptions }) {
+function ThermalOfferPreview({ products, visibleProductCount, setImageFailed, thermalOptions, thermalLayout }) {
   const visibleProducts = products.slice(0, visibleProductCount);
 
   return (
     <section className="print-preview" aria-label="Thermal offer print preview">
       <div className="thermal-receipt-sheet">
         {visibleProducts.map((product, index) => (
-          <ThermalOfferItem
-            key={index}
-            product={product}
-            productIndex={index}
-            setImageFailed={setImageFailed}
-            thermalOptions={thermalOptions}
-          />
+          thermalLayout === 'two' ? (
+            <ThermalPriceTopItem key={index} product={product} />
+          ) : (
+            <ThermalOfferItem
+              key={index}
+              product={product}
+              productIndex={index}
+              setImageFailed={setImageFailed}
+              thermalOptions={thermalOptions}
+            />
+          )
         ))}
       </div>
     </section>
+  );
+}
+
+function ThermalPriceTopItem({ product }) {
+  const displayName = product.displayName || ' ';
+  const nameLang = MALAYALAM_RANGE.test(displayName) ? 'ml' : 'en';
+  const offerPrice = product.offerPrice || '0';
+  const isEmpty = !product.displayName && !product.offerPrice;
+
+  if (isEmpty) {
+    return null;
+  }
+
+  return (
+    <article className="thermal-receipt-item thermal-receipt-split">
+      <div className="thermal-split-top">
+        <span className="thermal-split-offer">₹{offerPrice}</span>
+      </div>
+      <div className="thermal-split-bottom">
+        <h3 className="thermal-split-name" lang={nameLang}>{displayName}</h3>
+      </div>
+    </article>
   );
 }
 
