@@ -981,6 +981,8 @@ function ThermalOfferPreview({ products, visibleProductCount, setImageFailed, th
 function ThermalPriceTopItem({ product }) {
   const displayName = product.displayName || ' ';
   const nameLang = MALAYALAM_RANGE.test(displayName) ? 'ml' : 'en';
+  const quantity = product.quantity?.trim();
+  const mrp = product.mrp || '0';
   const offerPrice = product.offerPrice || '0';
   const isEmpty = !product.displayName && !product.offerPrice;
 
@@ -991,10 +993,12 @@ function ThermalPriceTopItem({ product }) {
   return (
     <article className="thermal-receipt-item thermal-receipt-split">
       <div className="thermal-split-top">
-        <span className="thermal-split-offer">₹{offerPrice}</span>
+        <span className="thermal-split-offer">{offerPrice}/-</span>
+        <span className="thermal-receipt-mrp">MRP {mrp}</span>
       </div>
       <div className="thermal-split-bottom">
         <h3 className="thermal-split-name" lang={nameLang}>{displayName}</h3>
+        {quantity && <span className="thermal-receipt-quantity">{quantity}</span>}
       </div>
     </article>
   );
