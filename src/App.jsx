@@ -993,9 +993,11 @@ function ThermalPriceTopItem({ product }) {
   return (
     <article className="thermal-receipt-item thermal-receipt-split">
       <div className="thermal-split-top">
-        {quantity && <span className="thermal-receipt-quantity thermal-split-left">{quantity}</span>}
+        <div className="thermal-split-left-stack">
+          <span className="thermal-receipt-mrp thermal-pill">MRP {mrp}/-</span>
+          {quantity && <span className="thermal-receipt-quantity thermal-pill">{quantity}</span>}
+        </div>
         <span className="thermal-split-offer">{offerPrice}/-</span>
-        <span className="thermal-receipt-mrp thermal-split-right">MRP {mrp}</span>
       </div>
       <div className="thermal-split-bottom">
         <h3 className="thermal-split-name" lang={nameLang}>{displayName}</h3>
