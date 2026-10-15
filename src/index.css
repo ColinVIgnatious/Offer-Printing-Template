@@ -595,6 +595,7 @@ h3 { font-size: 1.5rem; }
 }
 
 .thermal-receipt-item {
+  position: relative;
   display: inline-flex;
   align-items: stretch;
   gap: 0.9rem;
@@ -704,13 +705,14 @@ h3 { font-size: 1.5rem; }
   border-bottom: 1px dashed #000;
 }
 
-.thermal-split-left-stack {
+.thermal-split-row.thermal-split-top .thermal-receipt-mrp {
   grid-column: 1;
   justify-self: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
+}
+
+.thermal-split-row.thermal-split-top .thermal-receipt-quantity {
+  grid-column: 3;
+  justify-self: end;
 }
 
 .thermal-split-offer {
@@ -731,12 +733,27 @@ h3 { font-size: 1.5rem; }
 }
 
 .thermal-split-name {
-  font-size: 1.6rem;
+  font-size: 0.9rem;
   font-weight: 900;
   line-height: 1.1;
   text-align: center;
   max-width: 35rem;
   overflow-wrap: anywhere;
+}
+
+.thermal-receipt-banner {
+  position: absolute;
+  top: 0.4rem;
+  left: 1.1rem;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  z-index: 2;
 }
 
 .print-preview-modal-backdrop {
@@ -1481,6 +1498,7 @@ h3 { font-size: 1.5rem; }
   }
 
   .product-print-page.print-mode-thermal.thermal-layout-two .thermal-receipt-item {
+    border: 0;
     padding: 3mm 6mm;
   }
 
@@ -1489,10 +1507,6 @@ h3 { font-size: 1.5rem; }
     flex: 1 1 0;
     min-height: 0;
     padding: 0;
-  }
-
-  .product-print-page.print-mode-thermal.thermal-layout-two .thermal-split-left-stack {
-    gap: 1.5mm;
   }
 
   .product-print-page.print-mode-thermal.thermal-layout-two .thermal-split-offer {
@@ -1505,8 +1519,15 @@ h3 { font-size: 1.5rem; }
   }
 
   .product-print-page.print-mode-thermal.thermal-layout-two .thermal-split-name {
-    font-size: 14mm;
+    font-size: 8mm;
     max-width: 200mm;
+  }
+
+  .product-print-page.print-mode-thermal.thermal-layout-two .thermal-receipt-banner {
+    top: 2mm;
+    left: 4mm;
+    font-size: 4mm;
+    padding: 1mm 3mm;
   }
 
   .wholesale-offer-page {

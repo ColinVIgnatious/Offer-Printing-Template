@@ -984,6 +984,9 @@ function ThermalPriceTopItem({ product }) {
   const quantity = product.quantity?.trim();
   const mrp = product.mrp || '0';
   const offerPrice = product.offerPrice || '0';
+  const mrpNumber = Number(product.mrp);
+  const offerPriceNumber = Number(product.offerPrice);
+  const hasOffer = Number.isFinite(mrpNumber) && Number.isFinite(offerPriceNumber) && mrpNumber > offerPriceNumber;
   const isEmpty = !product.displayName && !product.offerPrice;
 
   if (isEmpty) {
@@ -992,12 +995,11 @@ function ThermalPriceTopItem({ product }) {
 
   return (
     <article className="thermal-receipt-item thermal-receipt-split">
-      <div className="thermal-split-top">
-        <div className="thermal-split-left-stack">
-          <span className="thermal-receipt-mrp thermal-pill">MRP {mrp}/-</span>
-          {quantity && <span className="thermal-receipt-quantity thermal-pill">{quantity}</span>}
-        </div>
+      {hasOffer && <span className="thermal-receipt-banner">OFFER</span>}
+      <div className="thermal-split-top thermal-split-row">
+        <span className="thermal-receipt-mrp thermal-pill">MRP {mrp}/-</span>
         <span className="thermal-split-offer">{offerPrice}/-</span>
+        {quantity && <span className="thermal-receipt-quantity thermal-pill">{quantity}</span>}
       </div>
       <div className="thermal-split-bottom">
         <h3 className="thermal-split-name" lang={nameLang}>{displayName}</h3>
