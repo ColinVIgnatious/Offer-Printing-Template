@@ -1457,6 +1457,11 @@ h3 { font-size: 1.5rem; }
     break-after: page;
   }
 
+  .product-print-page.print-mode-thermal.thermal-layout-one .thermal-receipt-item {
+    height: 77mm;
+    margin-top: 1.5mm;
+  }
+
   .product-print-page.print-mode-thermal .thermal-receipt-item:last-child {
     break-after: auto;
   }
